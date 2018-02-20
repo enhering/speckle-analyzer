@@ -23,7 +23,7 @@ ifeq ($(OS),MACOS)
   LCGICC=-L/usr/lib -L/Users/enhering/tmp/cgicc-3.2.12/cgicc/.libs -lcgicc
 
   IOPENCV=
-  LOPENCV=
+  LOPENCV=-L/usr/local/Cellar/opencv/3.4.0_1/lib -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_fuzzy -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
 
   IBOOST=-I/usr/local/Cellar/boost/1.64.0_1/include/
   LBOOST=-L/usr/local/Cellar/boost/1.64.0_1/lib/ -lboost_regex-mt
@@ -53,7 +53,7 @@ ifeq ($(OS),FREEBSD)
   LCGICC=-L/usr/local/lib -lcgicc
 
   IOPENCV=
-  LOPENCV=
+  LOPENCV=-L/usr/local/lib -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab -lpthread -lm
 
   IBOOST=-I/usr/local/include
   LBOOST=-L/usr/local/lib -lboost_regex-mt
@@ -115,8 +115,7 @@ all: $(BINDIR)/speckle-analyzer
 $(OBJDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp $(EXEC_SRC_DIR)/speckle-analyzer.h 
 	@echo 'speckle-analyzer'
 	@$(COMPILER) $(EXEC_SRC_DIR)/speckle-analyzer.cpp  \
-               $(OBJDIR)/Base.o         \
-               $(INCLUDES)    \
+               $(INCLUDES)  $(LOPENCV)  \
                -o $(BINDIR)/speckle-analyzer
 
 # $(OBJDIR)/View.o: $(CLASSES_SRC_DIR)/View.cpp $(CLASSES_SRC_DIR)/View.h 
