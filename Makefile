@@ -1,4 +1,4 @@
-HGPUSHURL=https://enhering@bitbucket.org/enhering/speckle-analyzer
+HGPUSHURL=ssh://hg@bitbucket.org/enhering/speckle-analyzer
 HGURL=https://enhering@bitbucket.org/enhering/speckle-analyzer
 
 BINDIR=bin/
