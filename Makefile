@@ -52,7 +52,7 @@ ifeq ($(OS),FREEBSD)
   ICGICC=-I/usr/local/include/
   LCGICC=-L/usr/local/lib -lcgicc
 
-  IOPENCV=-I/usr/local/include/opencv2
+  IOPENCV=-I/usr/local/include/opencv -I/usr/local/include
   LOPENCV=-L/usr/local/lib -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab -lpthread -lm
 
   IBOOST=-I/usr/local/include
@@ -76,37 +76,7 @@ ifeq ($(OS),FREEBSD)
   LNCURSES=-lncurses 
 endif
 
-ifeq ($(OS),RASPBIAN)
-  #COMPILER=llvm-g++ -w -std=c++0x
-  COMPILER=g++ -w -std=c++0x 
-  ICGICC=-I/usr/local/include
-  LCGICC=-L/usr/local/lib -lcgicc
 
-  IOPENCV=
-  LOPENCV=
-
-	IBOOST=-I/usr/local/include
-  LBOOST=-L/usr/lib -lboost_regex-mt
-
-  IGSL=-I/usr/local/include/
-  LGSL=-L/usr/local/lib -lgsl
-
-  IMGL=-I/usr/local/include
-  LMGL=-L/usr/local/lib -lmgl
-
-  IXML=-I/usr/include/libxml2/
-  LXML=-L/usr/lib/arm-linux-gnueabihf/ -lxml2
-
-  DOCUMENT_ROOT=/usr/home/$(USERNAME)/public_html
-  CGI_BIN=/usr/home/$(USERNAME)/public_html
-
-  IJSON=-I/home/pi/tmp/libjson
-  LJSON=-L/home/pi/tmp/libjson -ljson
-
-  LNCURSES=-lncurses 
-
-  ARM_PLATFORM=1
-endif
 
 INCLUDES=-Isrc/classes $(IOPENCV)
 
