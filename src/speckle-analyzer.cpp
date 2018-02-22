@@ -10,6 +10,7 @@ int main(int, char**)
 
     Mat result;
     namedWindow("result",1);
+    namedWindow("Current",1);
 
     for(;;) {
       Mat frame1, frame2;
@@ -22,6 +23,7 @@ int main(int, char**)
       //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
       // Canny(result, result, 0, 30, 3);
       imshow("result", result);
+      imshow("Current", frame1);
       if(waitKey(30) >= 0) break;
     }
     // the camera will be deinitialized automatically in VideoCapture destructor
