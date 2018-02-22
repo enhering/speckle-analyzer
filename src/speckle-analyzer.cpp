@@ -8,16 +8,20 @@ int main(int, char**)
     if(!cap.isOpened())  // check if we succeeded
         return -1;
 
-    Mat edges;
-    namedWindow("edges",1);
+    Mat result;
+    namedWindow("result",1);
 
     for(;;) {
-      Mat frame;
-      cap >> frame; // get a new frame from camera
-      cvtColor(frame, edges, CV_BGR2GRAY);
-      //GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
-      // Canny(edges, edges, 0, 30, 3);
-      imshow("edges", edges);
+      Mat frame1, frame2;
+      cap >> frame1; // get a new frame from camera
+      cap >> frame2;
+
+      subtract(frame1, frame2, result);
+
+      // cvtColor(frame, result, CV_BGR2GRAY);
+      //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
+      // Canny(result, result, 0, 30, 3);
+      imshow("result", result);
       if(waitKey(30) >= 0) break;
     }
     // the camera will be deinitialized automatically in VideoCapture destructor
