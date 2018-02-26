@@ -9,12 +9,15 @@ int main(int, char**)
         return -1;
 
     Mat result;
+    Mat frame1, frame2;
+
     namedWindow("result",1);
     namedWindow("Current",1);
 
+    cap >> frame1; // get a new frame from camera
+
     for(;;) {
-      Mat frame1, frame2;
-      cap >> frame1; // get a new frame from camera
+      
       cap >> frame2;
 
       subtract(frame1, frame2, result);
