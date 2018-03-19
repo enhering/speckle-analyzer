@@ -1,3 +1,4 @@
+#include <TApplication.h>
 #include "TCanvas.h"
 #include "TROOT.h"
 #include "TGraph.h"
@@ -6,7 +7,11 @@
 #include "TArrow.h"
 #include "TLatex.h"
 
-int main(int, char**) {
+int main(int argc, char* argv[]) {
+
+  TApplication app ("app", &argc, argv);
+
+  auto mycanvas = new TCanvas();
 
   const int n_points=10;
   double x_vals[n_points]= {1,2,3,4,5,6,7,8,9,10};
@@ -23,8 +28,7 @@ int main(int, char**) {
   graph.SetLineColor(kBlue);
 
   // The canvas on which we'll draw the graph
-  auto mycanvas = new TCanvas();
-
+  
   // Draw the graph !
   graph.DrawClone("APE");
 
