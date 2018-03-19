@@ -43,7 +43,7 @@ int main(int, char**) {
   graph.SetLineColor(kBlue);
 
   // The canvas on which we'll draw the graph
-  auto  mycanvas = new TCanvas();
+  auto mycanvas = new TCanvas();
 
   // Draw the graph !
   graph.DrawClone("APE");
@@ -51,7 +51,7 @@ int main(int, char**) {
   mycanvas->Print("graph_with_law.pdf");
 
 
-  VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
+  VideoCapture cap(0);// open the default camera
   if(!cap.isOpened())  // check if we succeeded
       return -1;
 
