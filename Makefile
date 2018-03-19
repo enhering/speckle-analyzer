@@ -16,6 +16,10 @@ endif
 ifneq ($(wildcard RASPBIAN),)
   OS=RASPBIAN
 endif
+ifneq ($(wildcard DEBIAN),)
+  OS=DEBIAN
+endif
+
 
 ifeq ($(OS),MACOS)
   COMPILER=llvm-g++ -w 
@@ -23,7 +27,7 @@ ifeq ($(OS),MACOS)
   LCGICC=-L/usr/lib -L/Users/enhering/tmp/cgicc-3.2.12/cgicc/.libs -lcgicc
 
   IOPENCV=
-  LOPENCV=-L/usr/local/Cellar/opencv/3.4.0_1/lib -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_fuzzy -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
+  LOPENCV=-L/usr/local/Cellar/opencv/3.4.0_1/lib -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_fuzzy -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core
 
   IBOOST=-I/usr/local/Cellar/boost/1.64.0_1/include/
   LBOOST=-L/usr/local/Cellar/boost/1.64.0_1/lib/ -lboost_regex-mt
@@ -40,11 +44,10 @@ ifeq ($(OS),MACOS)
   IJSON=-I/Users/enhering/tmp/libjson
   LJSON=-L/Users/enhering/tmp/libjson -ljson
 
-	IXML=-I/usr/local/Cellar/libxml2/2.9.3/include/libxml2/
+  IXML=-I/usr/local/Cellar/libxml2/2.9.3/include/libxml2/
   LXML=-L/usr/local/Cellar/libxml2/2.9.3/lib/libxml2.a -lxml2
 
   LNCURSES=-lncurses 
-
 endif
 
 ifeq ($(OS),FREEBSD)
@@ -76,16 +79,47 @@ ifeq ($(OS),FREEBSD)
   LNCURSES=-lncurses 
 endif
 
+ifeq ($(OS),DEBIAN)
+  COMPILER=g++ -w
+  ICGICC=-I/usr/local/include/
+  LCGICC=-L/usr/local/lib -lcgicc
+
+  IOPENCV=-I/usr/local/include/opencv -I/usr/local/include
+  LOPENCV=-L/usr/local/lib -lopencv_dnn -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_viz -lopencv_core
+ 
+  IROOT=-pthread -std=c++11 -m32 -msse -mfpmath=sse -I/usr/local/root/include
+  LROOT=-L/usr/local/root/lib -lCore -lImt -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lTreePlayer -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMultiProc -pthread -lm -ldl -rdynamic 
+
+  IBOOST=-I/usr/local/include
+  LBOOST=-L/usr/local/lib -lboost_regex-mt
+
+  IMYSQLCPPCONN=-I/usr/local/include/
+  LMYSQLCPPCONN=-L/usr/local/lib -l mysqlcppconn
+
+	ICRYPTOPP=-I/opt/local/include/
+  LCRYPTOPP=-L/opt/local/lib -lcryptopp
+
+  IXML=-I/usr/local/include/libxml2
+  LXML=-L/usr/local/lib -lxml2
+
+  DOCUMENT_ROOT=/usr/local/www/apache24/data/
+  CGI_BIN=/usr/local/www/apache24/data/
+
+  IJSON=-I~/tmp/libjson
+  LJSON=-L~/tmp/libjson -ljson
+
+  LNCURSES=-lncurses 
+endif
 
 
-INCLUDES=-Isrc/classes $(IOPENCV)
+INCLUDES=-Isrc/classes $(IOPENCV) $(IROOT)
 
 all: $(BINDIR)/speckle-analyzer
 
 $(OBJDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp $(EXEC_SRC_DIR)/speckle-analyzer.h 
 	@echo 'speckle-analyzer'
-	@$(COMPILER) $(EXEC_SRC_DIR)/speckle-analyzer.cpp  \
-               $(INCLUDES)  $(LOPENCV)  \
+	$(COMPILER) $(EXEC_SRC_DIR)/speckle-analyzer.cpp  \
+               $(INCLUDES)  $(LOPENCV)  $(LROOT) \
                -o $(BINDIR)/speckle-analyzer
 
 # $(OBJDIR)/View.o: $(CLASSES_SRC_DIR)/View.cpp $(CLASSES_SRC_DIR)/View.h 
