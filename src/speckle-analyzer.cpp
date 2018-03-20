@@ -11,45 +11,59 @@
 #include "TLatex.h"
 #include "TSystem.h"
 #include "TApplication.h"
-
+#include "TAxis.h"
 
 using namespace cv;
 
 Mat result;
-double g_nx, g_ny;
+int g_nMouseX, g_nMouseY;
+
+const int g_nNumPlotPoints = 1000;
+double g_fXData[g_nNumPlotPoints];
+double g_fYData[g_nNumPlotPoints];
+int g_nNumDataPoint;
+bool g_bEraseAllData;
+
+void ZeroDataPoints() {
+  for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
+    g_fXData[nI] = nI;
+    g_fYData[nI] = 0.0;
+  }
+}
 
 static void onMouse(int event,int x,int y,int,void*) {
   //this function will be called every time you move your mouse over the image
   // the coordinates will be in x and y variables
-  g_nx = x;
-  g_ny = y;
+
+  g_nMouseX = x;
+  g_nMouseY = y;
+
+  g_bEraseAllData = true;
 }
 
 int main(int argc, char* argv[]) {
 
-  const int nNumPlotPoints = 50;
-  double fXData[nNumPlotPoints];
-  double fYData[nNumPlotPoints];
-
-  int nNumDataPoint = 0;
-
-  for (int nI = 0; nI < nNumPlotPoints; nI++) {
-    fXData[nI] = nI;
-    fYData[nI] = 0.0;
-  }
+  g_bEraseAllData = false;
+  g_nNumDataPoint = 0;
 
   TApplication  app("app", &argc, argv);
-  TCanvas       canvas("a", "b", 0, 0, 400, 200);
-  TGraph        graph(nNumPlotPoints, fXData, fYData);
+  TCanvas       canvas("a", "b", 500, 700, 400, 200);
+  TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
 
-  graph.SetTitle("Measurement XYZ;lenght [cm];Arb.Units");
-  graph.SetMarkerStyle(kOpenCircle);
-  graph.SetMarkerColor(kBlue);
-  graph.SetLineColor(kBlue);
+  graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
+  
+  graph.SetMarkerStyle(2);
+  graph.SetMarkerColor(4);
+  graph.SetMarkerSize(0.3);
 
-  graph.DrawClone("APE");
+  graph.SetLineColor(4);
+  graph.SetLineWidth(1);
 
-  VideoCapture cap(0);// open the default camera
+  graph.GetXaxis()->SetNdivisions(5, kTRUE);
+
+  graph.Draw("APL");
+
+  VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
   if(!cap.isOpened())  // check if we succeeded
       return -1;
 
@@ -62,12 +76,12 @@ int main(int argc, char* argv[]) {
   // cap.set(CAP_PROP_FOURCC,0); 
   // cap.set(CAP_PROP_FRAME_COUNT,0); 
   // cap.set(CAP_PROP_FORMAT,0); 
-//  cap.set(cv::CAP_PROP_MODE,3); 
+  //cap.set(cv::CAP_PROP_MODE,3); 
 //  cap.set(CAP_PROP_BRIGHTNESS,0); 
   // cap.set(CAP_PROP_CONTRAST,0); 
 //  cap.set(CAP_PROP_SATURATION,0); 
- // cap.set(CAP_PROP_HUE,0); 
- // cap.set(CAP_PROP_GAIN,0); 
+  //cap.set(CAP_PROP_HUE,0); 
+  //cap.set(CAP_PROP_GAIN,0); 
  // cap.set(CAP_PROP_EXPOSURE,0); 
   // cap.set(CAP_PROP_CONVERT_RGB,0); 
   // cap.set(CAP_PROP_WHITE_BALANCE_BLUE_U,0); 
@@ -75,7 +89,7 @@ int main(int argc, char* argv[]) {
   // cap.set(CAP_PROP_MONOCHROME,0); 
   // cap.set(CAP_PROP_SHARPNESS,0); 
   // cap.set(CAP_PROP_AUTO_EXPOSURE,0); 
-  //cap.set(CAP_PROP_GAMMA,0); 
+  //cap.set(CAP_PROP_GAMMA,1); 
   // cap.set(CAP_PROP_TEMPERATURE,0); 
   // cap.set(CAP_PROP_TRIGGER,0); 
   // cap.set(CAP_PROP_TRIGGER_DELAY,0); 
@@ -106,35 +120,42 @@ int main(int argc, char* argv[]) {
 
     subtract(frame1, frame2, result);
 
-    Vec3f intensity = frame1.at<Vec3f>(g_ny, g_nx);
-    float blue = intensity.val[0];
-    float green = intensity.val[1];
-    float red = intensity.val[2];
+    Scalar intensity = frame1.at<uchar>(g_nMouseY, g_nMouseX);
 
-    std::cout << "x: "  << g_nx << " y: " << g_ny << " R:" << red << " G: " << green << " B: " << blue << std::endl;
+    std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
     int nPos;
-    if (nNumDataPoint >= nNumPlotPoints) {
-      for(int nI = 0; nI < (nNumPlotPoints - 2); nI++) {
-        fXData[nI] = fXData[nI + 1];
-        fYData[nI] = fYData[nI + 1];
-        graph.SetPoint(nI, fXData[nI], fYData[nI]);
+
+    if (g_bEraseAllData) {
+      for(int nI = 0; nI <= g_nNumPlotPoints - 1; nI++) {
+        graph.SetPoint(nI, nI, 0);
       }
-      nPos = nNumPlotPoints - 1;
-      fXData[nPos] = nNumDataPoint;
-      fYData[nPos] = green;
+      g_nNumDataPoint = 0;
+      g_bEraseAllData = false;
     }
     else {
-      nPos = nNumDataPoint;
-      fXData[nPos] = nNumDataPoint;
-      fYData[nPos] = green;
+      if (g_nNumDataPoint >= g_nNumPlotPoints) {
+        for(int nI = 0; nI <= (g_nNumPlotPoints - 2); nI++) {
+          g_fXData[nI] = g_fXData[nI + 1];
+          g_fYData[nI] = g_fYData[nI + 1];
+          graph.SetPoint(nI, g_fXData[nI], g_fYData[nI]);
+        }
+        nPos = g_nNumPlotPoints - 1;
+        g_fXData[nPos] = g_nNumDataPoint;
+        g_fYData[nPos] = (int) intensity.val[0];
+      }
+      else {
+        nPos = g_nNumDataPoint;
+        g_fXData[nPos] = g_nNumDataPoint;
+        g_fYData[nPos] = (int) intensity.val[0];
+      }
+      
+      graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
+      g_nNumDataPoint++;
     }
-    
-    graph.SetPoint(nPos, fXData[nPos], fYData[nPos]);
-    nNumDataPoint++;
-    
-    graph.DrawClone("APE");
-    canvas.Modified();
+
+    graph.Draw("APL");
+    canvas.Update();
 
     // cvtColor(frame, result, CV_BGR2GRAY);
     //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
