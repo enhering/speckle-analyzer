@@ -33,5 +33,7 @@ int main(int argc, char* argv[]) {
   graph.DrawClone("APE");
 
   mycanvas->Update();
+
+  app.Run();
 }
 

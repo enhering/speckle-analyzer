@@ -20,11 +20,8 @@ ifneq ($(wildcard DEBIAN),)
   OS=DEBIAN
 endif
 
-
 ifeq ($(OS),MACOS)
-#  COMPILER=llvm-g++ -w 
-  COMPILER=g++ -w 
-
+  COMPILER=llvm-g++ -w 
 
   ICGICC=-I/usr/include
   LCGICC=-L/usr/lib -L/Users/enhering/tmp/cgicc-3.2.12/cgicc/.libs -lcgicc
@@ -131,7 +128,7 @@ $(OBJDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp $(EXEC_SRC_DIR)
 $(OBJDIR)/Graph: $(EXEC_SRC_DIR)/Graph.cpp $(EXEC_SRC_DIR)/Graph.h 
 	@echo 'Graph'
 	$(COMPILER) $(EXEC_SRC_DIR)/Graph.cpp  \
-               $(INCLUDES)  $(LOPENCV)  $(LROOT) \
+               $(INCLUDES)  $(LROOT) \
                -o $(BINDIR)/Graph
 
 # $(OBJDIR)/View.o: $(CLASSES_SRC_DIR)/View.cpp $(CLASSES_SRC_DIR)/View.h 

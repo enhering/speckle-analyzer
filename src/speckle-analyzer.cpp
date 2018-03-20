@@ -9,15 +9,14 @@
 #include "TLegend.h"
 #include "TArrow.h"
 #include "TLatex.h"
+#include "TSystem.h"
+#include "TApplication.h"
+
 
 using namespace cv;
 
 Mat result;
-
-int g_nx, g_ny;
-
-const Int_t n = 20;
-Double_t x[n], y[n];
+double g_nx, g_ny;
 
 static void onMouse(int event,int x,int y,int,void*) {
   //this function will be called every time you move your mouse over the image
@@ -26,30 +25,29 @@ static void onMouse(int event,int x,int y,int,void*) {
   g_ny = y;
 }
 
-int main(int, char**) {
+int main(int argc, char* argv[]) {
 
-  const int n_points=10;
-  double x_vals[n_points]= {1,2,3,4,5,6,7,8,9,10};
-  double y_vals[n_points]= {6,12,14,20,22,24,35,45,44,53};
+  const int nNumPlotPoints = 50;
+  double fXData[nNumPlotPoints];
+  double fYData[nNumPlotPoints];
 
-  // Instance of the graph
-  TGraph graph(n_points,x_vals,y_vals);
+  int nNumDataPoint = 0;
+
+  for (int nI = 0; nI < nNumPlotPoints; nI++) {
+    fXData[nI] = nI;
+    fYData[nI] = 0.0;
+  }
+
+  TApplication  app("app", &argc, argv);
+  TCanvas       canvas("a", "b", 0, 0, 400, 200);
+  TGraph        graph(nNumPlotPoints, fXData, fYData);
 
   graph.SetTitle("Measurement XYZ;lenght [cm];Arb.Units");
-
-  // Make the plot estetically better
   graph.SetMarkerStyle(kOpenCircle);
   graph.SetMarkerColor(kBlue);
   graph.SetLineColor(kBlue);
 
-  // The canvas on which we'll draw the graph
-  auto mycanvas = new TCanvas();
-
-  // Draw the graph !
   graph.DrawClone("APE");
-
-  mycanvas->Print("graph_with_law.pdf");
-
 
   VideoCapture cap(0);// open the default camera
   if(!cap.isOpened())  // check if we succeeded
@@ -100,27 +98,54 @@ int main(int, char**) {
   namedWindow("result",1);
   namedWindow("Current",1);
 
-  setMouseCallback("result", onMouse);
+  setMouseCallback("Current", onMouse);
 
-  for(;;) {
+  while(1) {
     cap >> frame1; // get a new frame from camera
     cap >> frame2;
 
     subtract(frame1, frame2, result);
 
-    Vec3f intensity = result.at<Vec3f>(g_ny, g_nx);
+    Vec3f intensity = frame1.at<Vec3f>(g_ny, g_nx);
     float blue = intensity.val[0];
     float green = intensity.val[1];
     float red = intensity.val[2];
 
     std::cout << "x: "  << g_nx << " y: " << g_ny << " R:" << red << " G: " << green << " B: " << blue << std::endl;
 
+    int nPos;
+    if (nNumDataPoint >= nNumPlotPoints) {
+      for(int nI = 0; nI < (nNumPlotPoints - 2); nI++) {
+        fXData[nI] = fXData[nI + 1];
+        fYData[nI] = fYData[nI + 1];
+        graph.SetPoint(nI, fXData[nI], fYData[nI]);
+      }
+      nPos = nNumPlotPoints - 1;
+      fXData[nPos] = nNumDataPoint;
+      fYData[nPos] = green;
+    }
+    else {
+      nPos = nNumDataPoint;
+      fXData[nPos] = nNumDataPoint;
+      fYData[nPos] = green;
+    }
+    
+    graph.SetPoint(nPos, fXData[nPos], fYData[nPos]);
+    nNumDataPoint++;
+    
+    graph.DrawClone("APE");
+    canvas.Modified();
+
     // cvtColor(frame, result, CV_BGR2GRAY);
     //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
     // Canny(result, result, 0, 30, 3);
+
     imshow("result", result);
     imshow("Current", frame1);
-    if(waitKey(30) >= 0) break;
+
+    gSystem->ProcessEvents();
+
+    if (waitKey(30) >= 0) break;
   }
   // the camera will be deinitialized automatically in VideoCapture destructor
   return 0;
