@@ -63,7 +63,8 @@ int main(int argc, char* argv[]) {
 
   graph.Draw("APL");
 
-  VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
+  VideoCapture cap(0);// open the default camera
+  // VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
   if(!cap.isOpened())  // check if we succeeded
       return -1;
 
