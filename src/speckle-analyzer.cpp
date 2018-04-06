@@ -46,6 +46,20 @@ int main(int argc, char* argv[]) {
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
 
+/*
+  cvframe = cvCreateImage( cvSize(width,height),
+                             IPL_DEPTH_8U, 1 );
+  cvNamedWindow( "Camera 0", CV_WINDOW_AUTOSIZE);
+
+  CamContext_grab_next_frame_blocking(cc,pixels,0.2); // timeout after 200 msec
+    //CamContext_grab_next_frame_blocking(cc,pixels,-1.0f); // never timeout
+    
+  cvframe->imageData = pixels;
+  cvShowImage( "Camera 0", cvframe); 
+
+*/
+
+
   TApplication  app("app", &argc, argv);
   TCanvas       canvas("a", "b", 500, 700, 400, 200);
   TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
