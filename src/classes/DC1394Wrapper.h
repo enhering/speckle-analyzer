@@ -1,5 +1,5 @@
 #ifndef DC1394WRAPPER_H_
-  #define #DC1394WRAPPER_H_
+  #define DC1394WRAPPER_H_
 
   #include "Base.h"
   #include <dc1394/dc1394.h>
@@ -7,14 +7,14 @@
   #include <dc1394/control.h>
   #include <dc1394/utils.h>
 
-  class DC1394Wrapper.h : public Base {
+  class DC1394Wrapper : public Base {
     public:
       DC1394Wrapper();
       ~DC1394Wrapper();
 
-      static void CleanupAndExit(dc1394camera_t *);
+      void Cleanup(dc1394camera_t *);
 
-      void Init();
+      int Init();
 
       void Grab();
 
@@ -28,7 +28,9 @@
       dc1394featureset_t    m_cFeatures;
       dc1394_t            * m_pcD;
       dc1394camera_list_t * m_pcList;
-      dc1394error_t         m_cErr;
+      dc1394error_t         m_eErr;
 
-  }
+  };
+
+  // static dc1394camera_t      * m_pcCamera;
 #endif

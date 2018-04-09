@@ -1,5 +1,6 @@
 #include "DC1394Wrapper.h"
 
+
 DC1394Wrapper::DC1394Wrapper() {
 /*  
 #ifdef CAM_IFACE_CALL_UNLISTEN
@@ -11,93 +12,119 @@ DC1394Wrapper::DC1394Wrapper() {
 }
 
 DC1394Wrapper::~DC1394Wrapper() {
-  dc1394_video_set_transmission(m_pCamera, DC1394_OFF);
-  dc1394_capture_stop(m_pCamera);
-  dc1394_camera_free(m_pCamera);
+  Cleanup(m_pcCamera);
 }
 
-void DC1394Wrapper::CleanupAndExit(dc1394camera_t *camera) {
-  dc1394_video_set_transmission(m_pCamera, DC1394_OFF);
-  dc1394_capture_stop(m_pCamera);
-  dc1394_camera_free(m_pCamera);
-  exit(1);
+void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
+  dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
+  dc1394_capture_stop(m_pcCamera);
+  dc1394_camera_free(m_pcCamera);
 }
 
 int DC1394Wrapper::Init() {
-  m_cD = dc1394_new ();
+  m_pcD = dc1394_new ();
 
-  if (! m_cD)
+  if (! m_pcD)
     return 1;
-    m_cErr = dc1394_camera_enumerate (d, & m_pcList);
-    DC1394_ERR_RTN(m_cErr,"Failed to enumerate cameras");
+    m_eErr = dc1394_camera_enumerate (m_pcD, & m_pcList);
+    DC1394_ERR_RTN(m_eErr,"Failed to enumerate cameras");
 
-  if (m_cList->num == 0) {
-    fprintf(stdd::cerr, "No cameras found");
+  if (m_pcList->num == 0) {
+    fprintf(stderr, "No cameras found");
     return 1;
   }
 
-  m_pcCamera = dc1394_camera_new (d, m_cList->ids[0].guid);
+  m_pcCamera = dc1394_camera_new (m_pcD, m_pcList->ids[0].guid);
   if (! m_pcCamera) {
-    fprintf(stdd::cerr, "Failed to initialize camera with guid %llx", list->ids[0].guid);
+    fprintf(stderr, "Failed to initialize camera with guid %llx", m_pcList->ids[0].guid);
     return 1;
   }
-  dc1394_camera_free_list (list);
+  dc1394_camera_free_list (m_pcList);
 
-  printf("Using camera with GUID %"PRIx64"\n", camera->guid);
+  //printf("Using camera with GUID %"PRIx64"\n", m_pcCamera->guid);
+  printf("Using camera with GUID XXXX");
 
   /*-----------------------------------------------------------------------
    *  setup capture
    *-----------------------------------------------------------------------*/
 
-  m_cErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
-  DC1394_ERR_CLN_RTN(m_cErr,CleanupAndExit(m_pcCcamera),"Could not set iso speed");
+  m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
+  if (m_eErr) {
+    std::cout << "Could not set iso speed" << std::endl; 
+    Cleanup(m_pcCamera);
+    exit(1);
+  }
 
-  m_cErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8);
-  DC1394_ERR_CLN_RTN(m_cErr,CleanupAndExit(m_pcCcamera),"Could not set video mode\n");
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8);
+  if (m_eErr) {
+    std::cout << "Could not set video mode" << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);
+  }
 
-  m_cErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
-  DC1394_ERR_CLN_RTN(m_cErr,CleanupAndExit(m_pcCcamera),"Could not set framerate\n");
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
+  if (m_eErr) {
+    std::cout << "Could not set framerate"  << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);
+  }
 
-  m_cErr=dc1394_capture_setup(m_pcCamera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
-  DC1394_ERR_CLN_RTN(m_cErr,CleanupAndExit(m_pcCcamera),"Could not setup camera-\nmake sure that the video mode and framerate are\nsupported by your camera\n");
+  m_eErr=dc1394_capture_setup(m_pcCamera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
+  if (m_eErr) {
+    std::cout << "Could not setup camera-\nmake sure that the video mode and framerate are\nsupported by your camera" << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);
+  }
 }
 
 void DC1394Wrapper::Grab() {
   /*-----------------------------------------------------------------------
    *  have the camera start sending us data
    *-----------------------------------------------------------------------*/
-  m_cErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
-  DC1394_ERR_CLN_RTN(m_cErr,cleanup_and_exit(camera),"Could not start camera iso transmission\n");
+  m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
+  if (m_eErr) {
+    std::cout << "Could not start camera iso transmission" << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);
+  }
 
   /*-----------------------------------------------------------------------
    *  capture one frame
    *-----------------------------------------------------------------------*/
-  m_cErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &frame);
-  DC1394_ERR_CLN_RTN(m_cErr,cleanup_and_exit(camera),"Could not capture a frame\n");
-
+  m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
+  if (m_eErr) {
+    std::cout << "Could not capture a frame" << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);  
+  }
+  
   /*-----------------------------------------------------------------------
    *  stop data transmission
    *-----------------------------------------------------------------------*/
-  m_cErr=dc1394_video_set_transmission(m_pcCamera,DC1394_OFF);
-  DC1394_ERR_CLN_RTN(m_cErr,cleanup_and_exit(camera),"Could not stop the camera?\n");
+  m_eErr=dc1394_video_set_transmission(m_pcCamera,DC1394_OFF);
+  if (m_eErr) {
+    std::cout << "Could not stop the camera." << std::endl;
+    Cleanup(m_pcCamera);
+    exit(1);  
+  }
 
   /*-----------------------------------------------------------------------
    *  save image as 'Image.pgm'
    *-----------------------------------------------------------------------*/
-  m_pImagefile = fopen(IMAGE_FILE_NAME, "wb");
+  // m_pImageFile = fopen(IMAGE_FILE_NAME, "wb");
 
-  if( m_pImagefile == NULL) {
-    perror( "Can't create output file");
-    CleanupAndExit(m_pcCamera);
-  }
+  // if( m_pImageFile == NULL) {
+  //   perror( "Can't create output file");
+  //   CleanupAndExit(m_pcCamera);
+  // }
 
-  dc1394_get_image_size_from_video_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8, &m_nWidth, &m_nHeight);
+  // dc1394_get_image_size_from_video_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8, &m_nWidth, &m_nHeight);
 
-  fprintf(m_pImagefile,"P6\n%u %u\n255\n", m_nWidth, m_nHeight);
-  fwrite(frame->image, 1, m_nHeight*m_nWidth*3, m_pImagefile);
-  fclose(m_pImagefile);
+  // fprintf(m_pImageFile,"P6\n%u %u\n255\n", m_nWidth, m_nHeight);
+  // fwrite(frame->image, 1, m_nHeight*m_nWidth*3, m_pImageFile);
+  // fclose(m_pImageFile);
   
-  printf("wrote: " IMAGE_FILE_NAME " (%d image bytes)\n",m_nHeight*m_nWidth*3);
+  // printf("wrote: " IMAGE_FILE_NAME " (%d image bytes)\n",m_nHeight*m_nWidth*3);
 
 }
 
@@ -108,5 +135,5 @@ void DC1394Wrapper::Close() {
   dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
   dc1394_capture_stop(m_pcCamera);
   dc1394_camera_free(m_pcCamera);
-  dc1394_free (d);
+  dc1394_free (m_pcD);
 }

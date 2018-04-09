@@ -13,6 +13,8 @@
 #include "TApplication.h"
 #include "TAxis.h"
 
+#include "DC1394Wrapper.h"
+
 using namespace cv;
 
 Mat result;
@@ -23,6 +25,8 @@ double g_fXData[g_nNumPlotPoints];
 double g_fYData[g_nNumPlotPoints];
 int g_nNumDataPoint;
 bool g_bEraseAllData;
+
+IplImage * g_pcCVFrame;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -46,18 +50,17 @@ int main(int argc, char* argv[]) {
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
 
-/*
-  cvframe = cvCreateImage( cvSize(width,height),
+
+  
+  g_pcCVFrame = cvCreateImage( cvSize(width,height),
                              IPL_DEPTH_8U, 1 );
-  cvNamedWindow( "Camera 0", CV_WINDOW_AUTOSIZE);
+  // cvNamedWindow( "Camera 0", CV_WINDOW_AUTOSIZE);
 
-  CamContext_grab_next_frame_blocking(cc,pixels,0.2); // timeout after 200 msec
-    //CamContext_grab_next_frame_blocking(cc,pixels,-1.0f); // never timeout
+  // CamContext_grab_next_frame_blocking(cc,pixels,0.2); // timeout after 200 msec
+  //   //CamContext_grab_next_frame_blocking(cc,pixels,-1.0f); // never timeout
     
-  cvframe->imageData = pixels;
-  cvShowImage( "Camera 0", cvframe); 
-
-*/
+  g_pcCVFrame->imageData = pixels;
+  // cvShowImage( "Camera 0", g_pcCVFrame); 
 
 
   TApplication  app("app", &argc, argv);

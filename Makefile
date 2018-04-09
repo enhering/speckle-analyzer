@@ -124,29 +124,23 @@ $(OBJDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp \
 	                          $(OBJDIR)/DC1394Wrapper
 
 	@echo 'speckle-analyzer'
-	$(COMPILER) $(EXEC_SRC_DIR)/speckle-analyzer.cpp       \
-							$(OBJDIR)/Base                             \	
+	@$(COMPILER) $(EXEC_SRC_DIR)/speckle-analyzer.cpp       \
+							$(OBJDIR)/Base                             \
 	            $(OBJDIR)/DC1394Wrapper                    \
               $(INCLUDES)  $(LOPENCV)  $(LROOT) -ldc1394 \
               -o $(BINDIR)/speckle-analyzer
-
-$(OBJDIR)/Graph: $(EXEC_SRC_DIR)/Graph.cpp  \
-	               $(EXEC_SRC_DIR)/Graph.h 
-	@echo 'Graph'
-	$(COMPILER) $(EXEC_SRC_DIR)/Graph.cpp  \
-              $(INCLUDES)  $(LROOT) -o $(BINDIR)/Graph
 
 $(OBJDIR)/DC1394Wrapper: $(CLASSES_SRC_DIR)/DC1394Wrapper.cpp \
 	                       $(CLASSES_SRC_DIR)/DC1394Wrapper.h   \
 	                       $(OBJDIR)/Base
 	@echo 'DC1394Wrapper'
-	$(COMPILER) $(CLASSES_SRC_DIR)/DC1394Wrapper.cpp  \
+	@$(COMPILER) -c $(CLASSES_SRC_DIR)/DC1394Wrapper.cpp  \
               $(INCLUDES) -o $(BINDIR)/DC1394Wrapper
 
 $(OBJDIR)/Base: $(CLASSES_SRC_DIR)/Base.cpp \
 	              $(CLASSES_SRC_DIR)/Base.h 
 	@echo 'Base'
-	$(COMPILER) $(CLASSES_SRC_DIR)/Base.cpp  \
+	@$(COMPILER) -c $(CLASSES_SRC_DIR)/Base.cpp  \
               $(INCLUDES) -o $(BINDIR)/Base
 
 
