@@ -22,6 +22,8 @@ void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
 }
 
 int DC1394Wrapper::Init() {
+  std::cout << "Initializing camera..." ;
+
   m_pcD = dc1394_new ();
 
   if (! m_pcD)
@@ -42,7 +44,7 @@ int DC1394Wrapper::Init() {
   dc1394_camera_free_list (m_pcList);
 
   //printf("Using camera with GUID %"PRIx64"\n", m_pcCamera->guid);
-  printf("Using camera with GUID XXXX");
+  std::cout << "Using camera with GUID " << m_pcCamera->guid << ". ";
 
   /*-----------------------------------------------------------------------
    *  setup capture
@@ -75,9 +77,13 @@ int DC1394Wrapper::Init() {
     Cleanup(m_pcCamera);
     exit(1);
   }
+  std::cout << "Done." << std::endl;
 }
 
 void DC1394Wrapper::Grab() {
+
+  std::cout << "Capturing... " << std::endl;
+
   m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
   if (m_eErr) {
     std::cout << "Could not start camera iso transmission" << std::endl;
@@ -99,6 +105,7 @@ void DC1394Wrapper::Grab() {
     exit(1);  
   }
 
+  std::cout << " Done." << std::endl;
   //dc1394_get_image_size_from_video_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8, &m_nWidth, &m_nHeight);
 
   /*-----------------------------------------------------------------------

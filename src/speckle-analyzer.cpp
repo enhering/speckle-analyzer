@@ -78,10 +78,6 @@ int main(int argc, char* argv[]) {
 
   g_cDC1394Wrapper.Init();
   
-  // g_pcCVFrame = cvCreateImage( cvSize(g_cDC1394Wrapper.GetImageWidth(),
-  //                                     g_cDC1394Wrapper.GetImageHeight() ), 
-  //                              IPL_DEPTH_8U, 1 );
-  // cFrame1 = g_cDC1394Wrapper.GetImage();
   g_cDC1394Wrapper.Grab();
 
   Mat wrapped(g_cDC1394Wrapper.GetImageHeight(), 
@@ -101,8 +97,8 @@ int main(int argc, char* argv[]) {
   //    return -1;
 
 
-  // namedWindow("result",1);
-  // namedWindow("Current",1);
+  namedWindow("result",1);
+  namedWindow("Current",1);
 
   setMouseCallback("Current", onMouse);
 
@@ -116,11 +112,7 @@ int main(int argc, char* argv[]) {
                  IPL_DEPTH_8U, 
                  g_cDC1394Wrapper.GetImage());
 
-    // cvNamedWindow("Current", CV_WINDOW_AUTOSIZE);
-    // cvShowImage("Current", g_pcCVFrame);
-
     cFrame2 = wrapped2.clone();
-
     // cap >> cFrame2;
 
     subtract(cFrame1, cFrame2, result);
