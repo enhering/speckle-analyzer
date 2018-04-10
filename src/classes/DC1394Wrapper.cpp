@@ -57,14 +57,14 @@ int DC1394Wrapper::Init() {
     exit(1);
   }
 
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO8);
   if (m_eErr) {
     std::cout << "Could not set video mode" << std::endl;
     Cleanup(m_pcCamera);
     exit(1);
   }
 
-  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_15);
   if (m_eErr) {
     std::cout << "Could not set framerate"  << std::endl;
     Cleanup(m_pcCamera);
