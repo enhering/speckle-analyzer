@@ -2,10 +2,6 @@
   #define DC1394WRAPPER_H_
 
   #include "Base.h"
-  #include <dc1394/dc1394.h>
-  #include <dc1394/conversions.h>
-  #include <dc1394/control.h>
-  #include <dc1394/utils.h>
 
   class DC1394Wrapper : public Base {
     public:
@@ -17,6 +13,10 @@
       int Init();
 
       void Grab();
+
+      unsigned char * GetImage()       { return m_pcFrame->image;   }
+      uint32_t        GetImageWidth()  { return m_pcFrame->size[0]; }
+      uint32_t        GetImageHeight() { return m_pcFrame->size[1]; }
 
       void Close();
 

@@ -6,6 +6,11 @@
   #include <iostream>
   #include <fstream>
 
+  #include <dc1394/dc1394.h>
+  #include <dc1394/conversions.h>
+  #include <dc1394/control.h>
+  #include <dc1394/utils.h>
+
   class Base {
     public:
       Base();

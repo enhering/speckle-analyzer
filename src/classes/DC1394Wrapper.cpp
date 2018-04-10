@@ -78,9 +78,6 @@ int DC1394Wrapper::Init() {
 }
 
 void DC1394Wrapper::Grab() {
-  /*-----------------------------------------------------------------------
-   *  have the camera start sending us data
-   *-----------------------------------------------------------------------*/
   m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
   if (m_eErr) {
     std::cout << "Could not start camera iso transmission" << std::endl;
@@ -88,25 +85,21 @@ void DC1394Wrapper::Grab() {
     exit(1);
   }
 
-  /*-----------------------------------------------------------------------
-   *  capture one frame
-   *-----------------------------------------------------------------------*/
   m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
   if (m_eErr) {
     std::cout << "Could not capture a frame" << std::endl;
     Cleanup(m_pcCamera);
     exit(1);  
   }
-  
-  /*-----------------------------------------------------------------------
-   *  stop data transmission
-   *-----------------------------------------------------------------------*/
+
   m_eErr=dc1394_video_set_transmission(m_pcCamera,DC1394_OFF);
   if (m_eErr) {
     std::cout << "Could not stop the camera." << std::endl;
     Cleanup(m_pcCamera);
     exit(1);  
   }
+
+  //dc1394_get_image_size_from_video_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_RGB8, &m_nWidth, &m_nHeight);
 
   /*-----------------------------------------------------------------------
    *  save image as 'Image.pgm'
@@ -129,11 +122,5 @@ void DC1394Wrapper::Grab() {
 }
 
 void DC1394Wrapper::Close() {
- /*-----------------------------------------------------------------------
-   *  close camera
-   *-----------------------------------------------------------------------*/
-  dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
-  dc1394_capture_stop(m_pcCamera);
-  dc1394_camera_free(m_pcCamera);
-  dc1394_free (m_pcD);
+  Cleanup(m_pcCamera);
 }

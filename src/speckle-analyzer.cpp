@@ -26,7 +26,9 @@ double g_fYData[g_nNumPlotPoints];
 int g_nNumDataPoint;
 bool g_bEraseAllData;
 
-IplImage * g_pcCVFrame;
+DC1394Wrapper g_cDC1394Wrapper;
+
+Mat cFrame1, cFrame2;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -49,18 +51,12 @@ int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
-
-
   
-  g_pcCVFrame = cvCreateImage( cvSize(width,height),
-                             IPL_DEPTH_8U, 1 );
-  // cvNamedWindow( "Camera 0", CV_WINDOW_AUTOSIZE);
+  // 
 
   // CamContext_grab_next_frame_blocking(cc,pixels,0.2); // timeout after 200 msec
   //   //CamContext_grab_next_frame_blocking(cc,pixels,-1.0f); // never timeout
-    
-  g_pcCVFrame->imageData = pixels;
-  // cvShowImage( "Camera 0", g_pcCVFrame); 
+ 
 
 
   TApplication  app("app", &argc, argv);
@@ -80,65 +76,43 @@ int main(int argc, char* argv[]) {
 
   graph.Draw("APL");
 
-  VideoCapture cap(0);// open the default camera
+  g_cDC1394Wrapper.Init();
+  g_cDC1394Wrapper.Grab();
+  
+  // g_pcCVFrame = cvCreateImage( cvSize(g_cDC1394Wrapper.GetImageWidth(),
+  //                                     g_cDC1394Wrapper.GetImageHeight() ), 
+  //                              IPL_DEPTH_8U, 1 );
+  // cFrame1 = g_cDC1394Wrapper.GetImage();
+
+  Mat wrapped(g_cDC1394Wrapper.GetImageHeight(), 
+              g_cDC1394Wrapper.GetImageHeight(), 
+              IPL_DEPTH_8U, 
+              g_cDC1394Wrapper.GetImage());
+
+
+  // cvNamedWindow("Current", CV_WINDOW_AUTOSIZE);
+  // cvShowImage("Current", g_pcCVFrame);
+
+  cFrame1 = wrapped.clone();
+
+  //VideoCapture cap(0);// open the default camera
   // VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
-  if(!cap.isOpened())  // check if we succeeded
-      return -1;
+  //if(!cap.isOpened())  // check if we succeeded
+  //    return -1;
 
-  // cap.set(CAP_PROP_POS_MSEC,0); 
-  // cap.set(CAP_PROP_POS_FRAMES,0); 
-  // cap.set(CAP_PROP_POS_AVI_RATIO,0); 
-  // cap.set(CAP_PROP_FRAME_WIDTH,0); 
-  // cap.set(CAP_PROP_FRAME_HEIGHT,0); 
-  // cap.set(CAP_PROP_FPS,0); 
-  // cap.set(CAP_PROP_FOURCC,0); 
-  // cap.set(CAP_PROP_FRAME_COUNT,0); 
-  // cap.set(CAP_PROP_FORMAT,0); 
-  //cap.set(cv::CAP_PROP_MODE,3); 
-//  cap.set(CAP_PROP_BRIGHTNESS,0); 
-  // cap.set(CAP_PROP_CONTRAST,0); 
-//  cap.set(CAP_PROP_SATURATION,0); 
-  //cap.set(CAP_PROP_HUE,0); 
-  //cap.set(CAP_PROP_GAIN,0); 
- // cap.set(CAP_PROP_EXPOSURE,0); 
-  // cap.set(CAP_PROP_CONVERT_RGB,0); 
-  // cap.set(CAP_PROP_WHITE_BALANCE_BLUE_U,0); 
-  // cap.set(CAP_PROP_RECTIFICATION,0); 
-  // cap.set(CAP_PROP_MONOCHROME,0); 
-  // cap.set(CAP_PROP_SHARPNESS,0); 
-  // cap.set(CAP_PROP_AUTO_EXPOSURE,0); 
-  //cap.set(CAP_PROP_GAMMA,1); 
-  // cap.set(CAP_PROP_TEMPERATURE,0); 
-  // cap.set(CAP_PROP_TRIGGER,0); 
-  // cap.set(CAP_PROP_TRIGGER_DELAY,0); 
-  // cap.set(CAP_PROP_WHITE_BALANCE_RED_V,0); 
-  // cap.set(CAP_PROP_ZOOM,0); 
-  // cap.set(CAP_PROP_FOCUS,0); 
-  // cap.set(CAP_PROP_GUID,0); 
-  // cap.set(CAP_PROP_ISO_SPEED,0); 
-  // cap.set(CAP_PROP_BACKLIGHT,0); 
-  // cap.set(CAP_PROP_PAN,0); 
-  // cap.set(CAP_PROP_TILT,0); 
-  // cap.set(CAP_PROP_ROLL,0); 
-  // cap.set(CAP_PROP_IRIS,0); 
-  // cap.set(CAP_PROP_SETTINGS,0); 
-  // cap.set(CAP_PROP_BUFFERSIZE,0); 
-  // cap.set(CAP_PROP_AUTOFOCUS,0); 
 
-  Mat frame1, frame2;
-
-  namedWindow("result",1);
-  namedWindow("Current",1);
+  // namedWindow("result",1);
+  // namedWindow("Current",1);
 
   setMouseCallback("Current", onMouse);
 
   while(1) {
-    cap >> frame1; // get a new frame from camera
-    cap >> frame2;
+    // cap >> frame1; // get a new frame from camera
+    // cap >> cFrame2;
 
-    subtract(frame1, frame2, result);
+    subtract(cFrame1, cFrame2, result);
 
-    Scalar intensity = frame1.at<uchar>(g_nMouseY, g_nMouseX);
+    Scalar intensity = cFrame1.at<uchar>(g_nMouseY, g_nMouseX);
 
     std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
@@ -180,12 +154,15 @@ int main(int argc, char* argv[]) {
     // Canny(result, result, 0, 30, 3);
 
     imshow("result", result);
-    imshow("Current", frame1);
+    imshow("Current", cFrame1);
 
     gSystem->ProcessEvents();
 
     if (waitKey(30) >= 0) break;
   }
   // the camera will be deinitialized automatically in VideoCapture destructor
+
+  g_cDC1394Wrapper.Close();
+
   return 0;
 }
