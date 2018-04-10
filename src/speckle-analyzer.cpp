@@ -77,12 +77,12 @@ int main(int argc, char* argv[]) {
   graph.Draw("APL");
 
   g_cDC1394Wrapper.Init();
-  g_cDC1394Wrapper.Grab();
   
   // g_pcCVFrame = cvCreateImage( cvSize(g_cDC1394Wrapper.GetImageWidth(),
   //                                     g_cDC1394Wrapper.GetImageHeight() ), 
   //                              IPL_DEPTH_8U, 1 );
   // cFrame1 = g_cDC1394Wrapper.GetImage();
+  g_cDC1394Wrapper.Grab();
 
   Mat wrapped(g_cDC1394Wrapper.GetImageHeight(), 
               g_cDC1394Wrapper.GetImageHeight(), 
@@ -108,6 +108,19 @@ int main(int argc, char* argv[]) {
 
   while(1) {
     // cap >> frame1; // get a new frame from camera
+
+    g_cDC1394Wrapper.Grab();
+
+    Mat wrapped2(g_cDC1394Wrapper.GetImageHeight(), 
+                 g_cDC1394Wrapper.GetImageHeight(), 
+                 IPL_DEPTH_8U, 
+                 g_cDC1394Wrapper.GetImage());
+
+    // cvNamedWindow("Current", CV_WINDOW_AUTOSIZE);
+    // cvShowImage("Current", g_pcCVFrame);
+
+    cFrame2 = wrapped2.clone();
+
     // cap >> cFrame2;
 
     subtract(cFrame1, cFrame2, result);
