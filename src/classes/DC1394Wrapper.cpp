@@ -128,6 +128,16 @@ void DC1394Wrapper::Grab() {
 
 }
 
+void DC1394Wrapper::GetImage(unsigned char * pachBuffer) {
+  pachBuffer = (unsigned char *) malloc( m_pcFrame->allocated_image_bytes );
+  if (pachBuffer == NULL) {
+    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
+    exit(1);
+  }
+
+  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
+}
+
 void DC1394Wrapper::Close() {
   Cleanup(m_pcCamera);
 }

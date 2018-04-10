@@ -80,16 +80,19 @@ int main(int argc, char* argv[]) {
   
   g_cDC1394Wrapper.Grab();
 
+  unsigned char * pachImage;
+  g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
   Mat wrapped(g_cDC1394Wrapper.GetImageHeight(), 
               g_cDC1394Wrapper.GetImageHeight(), 
               IPL_DEPTH_8U, 
-              g_cDC1394Wrapper.GetImage());
+              pachImage);
 
 
   // cvNamedWindow("Current", CV_WINDOW_AUTOSIZE);
   // cvShowImage("Current", g_pcCVFrame);
 
   cFrame1 = wrapped.clone();
+  free(pachImage);
 
   //VideoCapture cap(0);// open the default camera
   // VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
@@ -107,12 +110,15 @@ int main(int argc, char* argv[]) {
 
     g_cDC1394Wrapper.Grab();
 
+    unsigned char * pachImage;
+    g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
     Mat wrapped2(g_cDC1394Wrapper.GetImageHeight(), 
                  g_cDC1394Wrapper.GetImageHeight(), 
                  IPL_DEPTH_8U, 
-                 g_cDC1394Wrapper.GetImage());
+                 pachImage);
 
     cFrame2 = wrapped2.clone();
+    free(pachImage);
     // cap >> cFrame2;
 
     subtract(cFrame1, cFrame2, result);
