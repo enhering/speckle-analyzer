@@ -107,19 +107,8 @@ void DC1394Wrapper::Grab() {
   std::cout << "Done." << std::endl;
 }
 
-void DC1394Wrapper::GetImage(unsigned char * pachBuffer) {
-  long nNumFrameBytes = m_pcFrame->image_bytes;
-
-  std::cout << "Allocating memory for frame data: ( " << m_pcFrame->size[0] << "," << m_pcFrame->size[1] 
-            << ") total " << nNumFrameBytes << "bytes." << std::endl;
-
-  pachBuffer = (unsigned char *) malloc( nNumFrameBytes );
-  if (pachBuffer == NULL) {
-    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
-    exit(1);
-  }
-
-  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
+unsigned char * DC1394Wrapper::GetImage() {
+  return m_pcFrame->image;
 }
 
 void DC1394Wrapper::StartTransmission() {

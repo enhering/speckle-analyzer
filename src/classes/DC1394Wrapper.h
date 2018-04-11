@@ -17,9 +17,10 @@
 
       void Grab();
 
-      void            GetImage(unsigned char *);
-      uint32_t        GetImageWidth()  { return m_pcFrame->size[0]; }
-      uint32_t        GetImageHeight() { return m_pcFrame->size[1]; }
+      unsigned char * GetImage();
+      uint32_t GetImageWidth()  { return m_pcFrame->size[0]; }
+      uint32_t GetImageHeight() { return m_pcFrame->size[1]; }
+      uint32_t GetImageSize()   { return m_pcFrame->image_bytes; }
 
       void  CheckError(int);
 

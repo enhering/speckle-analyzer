@@ -80,25 +80,11 @@ int main(int argc, char* argv[]) {
   
   g_cDC1394Wrapper.Grab();
 
-  unsigned char * pachImage;
-  g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
   Mat wrapped(g_cDC1394Wrapper.GetImageWidth(), 
               g_cDC1394Wrapper.GetImageHeight(), 
               IPL_DEPTH_8U, 
-              pachImage);
-
-
-  // cvNamedWindow("Current", CV_WINDOW_AUTOSIZE);
-  // cvShowImage("Current", g_pcCVFrame);
-
+              g_cDC1394Wrapper.GetImage());
   cFrame1 = wrapped.clone();
-  free(pachImage);
-
-  //VideoCapture cap(0);// open the default camera
-  // VideoCapture cap(cv::CAP_FIREWIRE);// open the default camera
-  //if(!cap.isOpened())  // check if we succeeded
-  //    return -1;
-
 
   namedWindow("result",1);
   namedWindow("Current",1);
@@ -110,16 +96,26 @@ int main(int argc, char* argv[]) {
 
     g_cDC1394Wrapper.Grab();
 
-    unsigned char * pachImage;
-    g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
+/*
+long nNumFrameBytes = m_pcFrame->image_bytes;
+
+  std::cout << "Allocating memory for frame data: ( " << m_pcFrame->size[0] << "," << m_pcFrame->size[1] 
+            << ") total " << nNumFrameBytes << "bytes." << std::endl;
+
+  pachBuffer = (unsigned char *) malloc( nNumFrameBytes );
+  if (pachBuffer == NULL) {
+    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
+    exit(1);
+  }
+
+  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
+*/
+
     Mat wrapped2(g_cDC1394Wrapper.GetImageWidth(), 
                  g_cDC1394Wrapper.GetImageHeight(), 
                  IPL_DEPTH_8U, 
-                 pachImage);
-
+                 g_cDC1394Wrapper.GetImage());
     cFrame2 = wrapped2.clone();
-    free(pachImage);
-    // cap >> cFrame2;
 
     subtract(cFrame1, cFrame2, result);
 
