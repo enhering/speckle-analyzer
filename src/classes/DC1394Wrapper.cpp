@@ -57,12 +57,12 @@ int DC1394Wrapper::Init() {
     exit(1);
   }
 
-  m_eErr=dc1394_reset_camera(m_pcCamera);
-  if (m_eErr) {
-    std::cout << "Could not reset the camera" << std::endl;
-    Cleanup(m_pcCamera);
-    exit(1);
-  }  
+  // m_eErr=dc1394_reset_camera(m_pcCamera);
+  // if (m_eErr) {
+  //   std::cout << "Could not reset the camera" << std::endl;
+  //   Cleanup(m_pcCamera);
+  //   exit(1);
+  // }  
 
   m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
   if (m_eErr) {
