@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 
   unsigned char * pachImage;
   g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
-  Mat wrapped(g_cDC1394Wrapper.GetImageHeight(), 
+  Mat wrapped(g_cDC1394Wrapper.GetImageWidth(), 
               g_cDC1394Wrapper.GetImageHeight(), 
               IPL_DEPTH_8U, 
               pachImage);
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
 
     unsigned char * pachImage;
     g_cDC1394Wrapper.GetImage(pachImage); // memory is allocated by method
-    Mat wrapped2(g_cDC1394Wrapper.GetImageHeight(), 
+    Mat wrapped2(g_cDC1394Wrapper.GetImageWidth(), 
                  g_cDC1394Wrapper.GetImageHeight(), 
                  IPL_DEPTH_8U, 
                  pachImage);

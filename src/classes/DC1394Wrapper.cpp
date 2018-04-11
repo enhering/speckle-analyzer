@@ -118,7 +118,7 @@ void DC1394Wrapper::StartTransmission() {
 
 void DC1394Wrapper::StopTransmission() {
   std::cout << "Stopping video transmission... ";
-  m_eErr=dc1394_video_set_transmission(m_pcCamera,DC1394_OFF);
+  m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
   CheckError(8);
   std::cout << "Done." << std::endl;
 }
