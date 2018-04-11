@@ -101,7 +101,7 @@ void DC1394Wrapper::Grab() {
     StartTransmission();
   }
 
-  std::cout << "Capturing... " << std::endl;
+  std::cout << "Capturing... ";
   m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
   CheckError(6);
   std::cout << "Done." << std::endl;
