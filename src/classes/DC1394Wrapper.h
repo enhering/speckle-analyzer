@@ -12,11 +12,16 @@
 
       int Init();
 
+      void StartTransmission();
+      void StopTransmission();
+
       void Grab();
 
       void            GetImage(unsigned char *);
       uint32_t        GetImageWidth()  { return m_pcFrame->size[0]; }
       uint32_t        GetImageHeight() { return m_pcFrame->size[1]; }
+
+      void  CheckError(int);
 
       void Close();
 
@@ -29,6 +34,8 @@
       dc1394_t            * m_pcD;
       dc1394camera_list_t * m_pcList;
       dc1394error_t         m_eErr;
+
+      bool                  m_bTransmissionStarted;
 
   };
 
