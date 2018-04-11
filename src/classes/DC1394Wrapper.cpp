@@ -27,18 +27,23 @@ void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
 }
 
 int DC1394Wrapper::Init() {
-  m_pcD = dc1394_new ();
 
+  std::cout << "Instantiating DC1394... ";
+  m_pcD = dc1394_new();
   if (! m_pcD)
     return 1;
-    m_eErr = dc1394_camera_enumerate (m_pcD, & m_pcList);
-    DC1394_ERR_RTN(m_eErr,"Failed to enumerate cameras");
+  std::cout << "Done." << std::endl;
+
+  std::cout << "Listing cameras... ";
+  m_eErr = dc1394_camera_enumerate (m_pcD, & m_pcList);
+  CheckError(0);
+  std::cout << "Done." << std::endl;
 
   if (m_pcList->num == 0) {
-    fprintf(stderr, "No cameras found");
-    return 1;
+    std::cout << "No cameras found!" << std::endl;
   }
 
+  std::cout << "Instantiating camera... ";
   m_pcCamera = dc1394_camera_new (m_pcD, m_pcList->ids[0].guid);
   if (! m_pcCamera) {
     fprintf(stderr, "Failed to initialize camera with guid %llx", m_pcList->ids[0].guid);
@@ -46,36 +51,32 @@ int DC1394Wrapper::Init() {
   }
   dc1394_camera_free_list (m_pcList);
 
-  //printf("Using camera with GUID %"PRIx64"\n", m_pcCamera->guid);
-  std::cout << "Using camera with GUID " << m_pcCamera->guid << ". ";
-
-  /*-----------------------------------------------------------------------
-   *  setup capture
-   *-----------------------------------------------------------------------*/
+  fprintf(stderr, "Initialized camera with guid %llx. ", m_pcCamera->guid);
+  std::cout << "Done." << std::endl;
 
   std::cout << "Resetting bus... ";
   m_eErr =  dc1394_reset_bus(m_pcCamera);
-  CheckError(0);
+  CheckError(1);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting ISO speed... ";
   m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
-  CheckError(1);
+  CheckError(2);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
   m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO8);
-  CheckError(2);
+  CheckError(3);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting frame rate... ";
   m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_15);
-  CheckError(3);
+  CheckError(4);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting capture flags... ";
   m_eErr=dc1394_capture_setup(m_pcCamera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
-  CheckError(4);
+  CheckError(5);
   std::cout << "Done." << std::endl;
 }
 
@@ -94,7 +95,7 @@ void DC1394Wrapper::Grab() {
 void DC1394Wrapper::StartTransmission() {
   std::cout << "Starting video transmission... ";
   m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
-  CheckError(5);
+  CheckError(7);
   std::cout << "Done." << std::endl;
 
   m_bTransmissionStarted = true;
@@ -103,7 +104,7 @@ void DC1394Wrapper::StartTransmission() {
 void DC1394Wrapper::StopTransmission() {
   std::cout << "Stopping video transmission... ";
   m_eErr=dc1394_video_set_transmission(m_pcCamera,DC1394_OFF);
-  CheckError(7);
+  CheckError(8);
   std::cout << "Done." << std::endl;
 }
 
