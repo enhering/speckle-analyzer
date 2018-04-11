@@ -46,7 +46,7 @@ int DC1394Wrapper::Init() {
   std::cout << "Instantiating camera... ";
   m_pcCamera = dc1394_camera_new (m_pcD, m_pcList->ids[0].guid);
   if (! m_pcCamera) {
-    fprintf(stderr, "Failed to initialize camera with guid %llx", m_pcList->ids[0].guid);
+    fprintf(stderr, "Failed to initialize camera with guid %llx\n", m_pcList->ids[0].guid);
     return 1;
   }
   dc1394_camera_free_list (m_pcList);
@@ -80,12 +80,12 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO8);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_FORMAT7_3);
   CheckError(3);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting frame rate... ";
-  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_15);
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
   CheckError(4);
   std::cout << "Done." << std::endl;
 
