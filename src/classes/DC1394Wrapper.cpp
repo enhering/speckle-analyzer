@@ -59,6 +59,21 @@ int DC1394Wrapper::Init() {
   CheckError(1);
   std::cout << "Done." << std::endl;
 
+  std::cout << "Powering down camera... ";
+  m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_OFF);
+  CheckError(11);
+  std::cout << "Done." << std::endl;
+
+  std::cout << "Powering up camera... ";
+  m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_ON);
+  CheckError(12);
+  std::cout << "Done." << std::endl;
+
+  // std::cout << "Resetting camera... ";
+  // m_eErr =  dc1394_reset_camera(m_pcCamera);
+  // CheckError(10);
+  // std::cout << "Done." << std::endl;
+
   std::cout << "Setting ISO speed... ";
   m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
   CheckError(2);
