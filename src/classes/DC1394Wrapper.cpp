@@ -107,6 +107,21 @@ void DC1394Wrapper::Grab() {
   std::cout << "Done." << std::endl;
 }
 
+void DC1394Wrapper::GetImage(unsigned char * pachBuffer) {
+  long nNumFrameBytes = m_pcFrame->allocated_image_bytes;
+
+  std::cout << "Allocating memory for frame data: ( " << m_pcFrame->size[0] << "," << m_pcFrame->size[1] 
+            << ") total " << nNumFrameBytes << "bytes." << std::endl;
+            
+  pachBuffer = (unsigned char *) malloc( nNumFrameBytes );
+  if (pachBuffer == NULL) {
+    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
+    exit(1);
+  }
+
+  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
+}
+
 void DC1394Wrapper::StartTransmission() {
   std::cout << "Starting video transmission... ";
   m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
@@ -123,24 +138,14 @@ void DC1394Wrapper::StopTransmission() {
   std::cout << "Done." << std::endl;
 }
 
+void DC1394Wrapper::Close() {
+  Cleanup(m_pcCamera);
+}
+
 void DC1394Wrapper::CheckError(int nStep) {
   if (m_eErr) {
     std::cout << "Somethig went wrong on step " << nStep << std::endl;
     Cleanup(m_pcCamera);
     exit(1);
   }
-}
-
-void DC1394Wrapper::GetImage(unsigned char * pachBuffer) {
-  pachBuffer = (unsigned char *) malloc( m_pcFrame->allocated_image_bytes );
-  if (pachBuffer == NULL) {
-    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
-    exit(1);
-  }
-
-  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
-}
-
-void DC1394Wrapper::Close() {
-  Cleanup(m_pcCamera);
 }
