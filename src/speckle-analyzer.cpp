@@ -26,6 +26,8 @@ double g_fYData[g_nNumPlotPoints];
 int g_nNumDataPoint;
 bool g_bEraseAllData;
 
+int g_ImageHeight, g_ImageWidth;
+
 DC1394Wrapper g_cDC1394Wrapper;
 
 Mat cFrame1, cFrame2;
@@ -52,13 +54,6 @@ int main(int argc, char* argv[]) {
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
   
-  // 
-
-  // CamContext_grab_next_frame_blocking(cc,pixels,0.2); // timeout after 200 msec
-  //   //CamContext_grab_next_frame_blocking(cc,pixels,-1.0f); // never timeout
- 
-
-
   TApplication  app("app", &argc, argv);
   TCanvas       canvas("a", "b", 500, 700, 400, 200);
   TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
@@ -80,9 +75,20 @@ int main(int argc, char* argv[]) {
   
   g_cDC1394Wrapper.Grab();
 
-  Mat wrapped(g_cDC1394Wrapper.GetImageWidth(), 
-              g_cDC1394Wrapper.GetImageHeight(), 
-              IPL_DEPTH_8U, 
+  g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
+  g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+
+  std::cout << "Frame data: width=" 
+            << g_ImageWidth 
+            << " height=" 
+            << g_ImageHeight 
+            << " size " 
+            << g_cDC1394Wrapper.GetImageSize()
+            << "bytes." << std::endl;
+
+  Mat wrapped(g_ImageWidth, 
+              g_ImageHeight, 
+              CV_16UC3, 
               g_cDC1394Wrapper.GetImage());
   cFrame1 = wrapped.clone();
 
@@ -111,10 +117,22 @@ long nNumFrameBytes = m_pcFrame->image_bytes;
   memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
 */
 
+    g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
+    g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+
+    std::cout << "Frame data: width=" 
+              << g_ImageWidth 
+              << " height=" 
+              << g_ImageHeight 
+              << " size " 
+              << g_cDC1394Wrapper.GetImageSize()
+              << "bytes." << std::endl;
+
     Mat wrapped2(g_cDC1394Wrapper.GetImageWidth(), 
                  g_cDC1394Wrapper.GetImageHeight(), 
-                 IPL_DEPTH_8U, 
+                 CV_16UC3, 
                  g_cDC1394Wrapper.GetImage());
+
     cFrame2 = wrapped2.clone();
 
     subtract(cFrame1, cFrame2, result);

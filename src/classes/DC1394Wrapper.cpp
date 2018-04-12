@@ -21,7 +21,6 @@ void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
     StopTransmission();
   }
 
-  dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
   dc1394_capture_stop(m_pcCamera);
   dc1394_camera_free(m_pcCamera);
 }
@@ -46,28 +45,24 @@ int DC1394Wrapper::Init() {
   std::cout << "Instantiating camera... ";
   m_pcCamera = dc1394_camera_new (m_pcD, m_pcList->ids[0].guid);
   if (! m_pcCamera) {
-    fprintf(stderr, "Failed to initialize camera with guid %llx\n", m_pcList->ids[0].guid);
-    return 1;
+    fprintf(stderr, "Failed to initialize camera with guid %llx \n", m_pcList->ids[0].guid);
+    exit(1);
   }
   dc1394_camera_free_list (m_pcList);
 
-  fprintf(stderr, "Initialized camera with guid %llx. ", m_pcCamera->guid);
+  fprintf(stderr, "Initialized camera with guid %llx. \n", m_pcCamera->guid);
   std::cout << "Done." << std::endl;
 
-  std::cout << "Resetting bus... ";
-  m_eErr =  dc1394_reset_bus(m_pcCamera);
-  CheckError(1);
-  std::cout << "Done." << std::endl;
+  // 
+  // std::cout << "Powering down camera... ";
+  // m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_OFF);
+  // CheckError(11);
+  // std::cout << "Done." << std::endl;
 
-  std::cout << "Powering down camera... ";
-  m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_OFF);
-  CheckError(11);
-  std::cout << "Done." << std::endl;
-
-  std::cout << "Powering up camera... ";
-  m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_ON);
-  CheckError(12);
-  std::cout << "Done." << std::endl;
+  // std::cout << "Powering up camera... ";
+  // m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_ON);
+  // CheckError(12);
+  // std::cout << "Done." << std::endl;
 
   // std::cout << "Resetting camera... ";
   // m_eErr =  dc1394_reset_camera(m_pcCamera);
@@ -80,12 +75,12 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_FORMAT7_3);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO16);
   CheckError(3);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting frame rate... ";
-  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_30);
   CheckError(4);
   std::cout << "Done." << std::endl;
 
@@ -133,7 +128,7 @@ void DC1394Wrapper::Close() {
 
 void DC1394Wrapper::CheckError(int nStep) {
   if (m_eErr) {
-    std::cout << "Somethig went wrong on step " << nStep << std::endl;
+    std::cout << "Something went wrong on step " << nStep << std::endl;
     Cleanup(m_pcCamera);
     exit(1);
   }
