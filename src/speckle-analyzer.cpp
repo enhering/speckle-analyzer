@@ -30,7 +30,7 @@ int g_ImageHeight, g_ImageWidth;
 
 DC1394Wrapper g_cDC1394Wrapper;
 
-Mat cFrame1, cFrame2;
+Mat cFrame1;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -86,11 +86,18 @@ int main(int argc, char* argv[]) {
             << g_cDC1394Wrapper.GetImageSize()
             << "bytes." << std::endl;
 
-  Mat wrapped(g_ImageWidth, 
-              g_ImageHeight, 
-              CV_16UC3, 
-              g_cDC1394Wrapper.GetImage());
-  cFrame1 = wrapped.clone();
+  Mat cFrame1 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
+
+  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
+      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
+      uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
+
+      cFrame1.at<short>(nX,nY) = nPixelValue;
+    }
+  }
 
   namedWindow("result",1);
   namedWindow("Current",1);
@@ -101,10 +108,11 @@ int main(int argc, char* argv[]) {
     // cap >> frame1; // get a new frame from camera
 
     g_cDC1394Wrapper.Grab();
+
     g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
     g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-    std::cout << "Frame 2 data: width=" 
+    std::cout << "Frame1  data: width=" 
               << g_ImageWidth 
               << " height=" 
               << g_ImageHeight 
@@ -112,12 +120,18 @@ int main(int argc, char* argv[]) {
               << g_cDC1394Wrapper.GetImageSize()
               << "bytes." << std::endl;
 
-    Mat wrapped2(g_cDC1394Wrapper.GetImageWidth(), 
-                 g_cDC1394Wrapper.GetImageHeight(), 
-                 CV_16UC3, 
-                 g_cDC1394Wrapper.GetImage());
+    Mat cFrame2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+    uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
-    cFrame2 = wrapped2.clone();
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+        uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
+        uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
+        uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
+
+        cFrame2.at<short>(nX,nY) = nPixelValue;
+      }
+    }
 
     subtract(cFrame1, cFrame2, result);
 
