@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      std::cout << "copying pixel " << nX << ", " << nY << std::endl;
       uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
       uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
       uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
