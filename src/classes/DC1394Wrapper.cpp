@@ -103,7 +103,7 @@ void DC1394Wrapper::Grab() {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
     if (m_pcFrame == NULL) {
-      std::cout << "Empty buffer... Waiting 1msec. ";  
+      std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
     }
     else {
       bCaptureOK = true;
