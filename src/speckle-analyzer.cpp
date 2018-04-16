@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
       uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
       uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
 
-      std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
+      //std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
 
       cFrame1.at<short>(nX,nY) = nPixelValue;
     }
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
 
     Scalar intensity = cFrame1.at<uchar>(g_nMouseY, g_nMouseX);
 
-    std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
+    //std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
     int nPos;
 
