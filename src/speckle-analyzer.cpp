@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
         uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
         uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
 
-        std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
+        // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
 
         cFrame2.at<short>(nX,nY) = nPixelValue;
       }
