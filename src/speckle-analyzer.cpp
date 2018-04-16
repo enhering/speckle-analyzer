@@ -89,8 +89,8 @@ int main(int argc, char* argv[]) {
   Mat cFrame1 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
-  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+  for (uint16_t nY = 0; nY < g_ImageWidth; nY++) {
+    for (uint16_t nX = 0; nX < g_ImageHeight; nX++) {
       std::cout << "copying pixel " << nX << ", " << nY << std::endl;
       uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
       uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
     g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
     g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-    std::cout << "Frame1  data: width=" 
+    std::cout << "Frame2  data: width=" 
               << g_ImageWidth 
               << " height=" 
               << g_ImageHeight 
@@ -124,8 +124,8 @@ int main(int argc, char* argv[]) {
     Mat cFrame2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
     uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+    for (uint16_t nY = 0; nY < g_ImageWidth; nY++) {
+      for (uint16_t nX = 0; nX < g_ImageHeight; nX++) {
         uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
         uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
         uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
