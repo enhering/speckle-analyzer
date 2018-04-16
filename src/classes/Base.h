@@ -6,6 +6,7 @@
   #include <iostream>
   #include <fstream>
   #include <cstring>
+  #include <unistd.h>
 
   #include <dc1394/dc1394.h>
   #include <dc1394/conversions.h>

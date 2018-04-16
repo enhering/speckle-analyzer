@@ -92,13 +92,25 @@ int DC1394Wrapper::Init() {
 
 void DC1394Wrapper::Grab() {
 
+  bool bCaptureOK = false;
+
   if (! m_bTransmissionStarted) {
     StartTransmission();
   }
 
   std::cout << "Capturing... ";
-  m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
-  CheckError(6);
+  while (! bCaptureOK) {
+    m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
+    CheckError(6);
+    if (m_pcFrame == NULL) {
+      std::cout << "Empty buffer... Waiting 1msec. ";  
+    }
+    else {
+      bCaptureOK = true;
+      break;
+    }
+    usleep(1000);
+  }
   std::cout << "Done." << std::endl;
 }
 
