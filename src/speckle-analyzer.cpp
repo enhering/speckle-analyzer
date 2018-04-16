@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
   g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
   g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-  std::cout << "Frame data: width=" 
+  std::cout << "Frame1  data: width=" 
             << g_ImageWidth 
             << " height=" 
             << g_ImageHeight 
@@ -101,26 +101,10 @@ int main(int argc, char* argv[]) {
     // cap >> frame1; // get a new frame from camera
 
     g_cDC1394Wrapper.Grab();
-
-/*
-long nNumFrameBytes = m_pcFrame->image_bytes;
-
-  std::cout << "Allocating memory for frame data: ( " << m_pcFrame->size[0] << "," << m_pcFrame->size[1] 
-            << ") total " << nNumFrameBytes << "bytes." << std::endl;
-
-  pachBuffer = (unsigned char *) malloc( nNumFrameBytes );
-  if (pachBuffer == NULL) {
-    fprintf(stderr,"couldn't allocate memory in %s, line %d\n",__FILE__,__LINE__);
-    exit(1);
-  }
-
-  memcpy(pachBuffer, m_pcFrame->image, sizeof(pachBuffer));
-*/
-
     g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
     g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-    std::cout << "Frame data: width=" 
+    std::cout << "Frame 2 data: width=" 
               << g_ImageWidth 
               << " height=" 
               << g_ImageHeight 
