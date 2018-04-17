@@ -53,6 +53,7 @@ int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
+  int nNumBytesPerPixel = 2;
   
   TApplication  app("app", &argc, argv);
   TCanvas       canvas("a", "b", 500, 700, 400, 200);
@@ -89,10 +90,10 @@ int main(int argc, char* argv[]) {
   Mat cFrame1 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
-  for (uint16_t nY = 0; nY < g_ImageWidth; nY++) {
-    for (uint16_t nX = 0; nX < g_ImageHeight; nX++) {
-      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
-      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
+  for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+0))); // 16bit value
+      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+1))); // 16bit value
       uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
 
       //std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
@@ -131,10 +132,10 @@ int main(int argc, char* argv[]) {
     Mat cFrame2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
     uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
-    for (uint16_t nY = 0; nY < g_ImageWidth; nY++) {
-      for (uint16_t nX = 0; nX < g_ImageHeight; nX++) {
-        uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+0))); // 16bit value
-        uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth + ((nX * 2)+1))); // 16bit value
+    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+        uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+0))); // 16bit value
+        uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+1))); // 16bit value
         uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
 
         // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
