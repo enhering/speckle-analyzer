@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
     // Canny(result, result, 0, 30, 3);
 
     imshow("result", result);
-    imshow("Current", cFrame1);
+    imshow("Current", cFrame2);
 
     gSystem->ProcessEvents();
 
