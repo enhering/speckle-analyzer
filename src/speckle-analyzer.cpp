@@ -106,6 +106,12 @@ int main(int argc, char* argv[]) {
 
   setMouseCallback("Current", onMouse);
 
+  std::vector<int> qualityType;
+  qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
+  qualityType.push_back(90);
+
+  cv::imwrite("Frame1.jpg", cFrame1, qualityType);
+
   while(1) {
     // cap >> frame1; // get a new frame from camera
 
