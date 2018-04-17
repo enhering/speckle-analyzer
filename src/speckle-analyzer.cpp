@@ -143,6 +143,8 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    cv::imwrite("Frame2.jpg", cFrame1, qualityType);
+
     subtract(cFrame1, cFrame2, result);
 
     Scalar intensity = cFrame1.at<uchar>(g_nMouseY, g_nMouseX);
