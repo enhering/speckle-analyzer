@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
             << g_cDC1394Wrapper.GetImageSize()
             << "bytes." << std::endl;
 
-  Mat cFrame1 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+  Mat cFrame1 = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC1);
   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
   for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
               << g_cDC1394Wrapper.GetImageSize()
               << "bytes." << std::endl;
 
-    Mat cFrame2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+    Mat cFrame2 = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC1);
     uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
 
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
