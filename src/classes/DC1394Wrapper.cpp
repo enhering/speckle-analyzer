@@ -16,16 +16,11 @@ DC1394Wrapper::~DC1394Wrapper() {
   Cleanup(m_pcCamera);
 }
 
-void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
-  if (m_bTransmissionStarted) {
-    StopTransmission();
-  }
-
-  dc1394_capture_stop(m_pcCamera);
-  dc1394_camera_free(m_pcCamera);
-}
-
 int DC1394Wrapper::Init() {
+
+  // std::cout << "Cleaning up ISO channels and bandwidth... ";
+  // dc1394_cleanup_iso_channels_and_bandwidth();
+  // std::cout << "Done." << std::endl;
 
   std::cout << "Instantiating DC1394... ";
   m_pcD = dc1394_new();
@@ -53,6 +48,12 @@ int DC1394Wrapper::Init() {
   fprintf(stderr, "Initialized camera with guid %llx. \n", m_pcCamera->guid);
   std::cout << "Done." << std::endl;
 
+
+  // std::cout << "Resetting bus... ";
+  // m_eErr =  dc1394_reset_bus(m_pcCamera);
+  // CheckError(20);
+  // std::cout << "Done." << std::endl;
+
   // 
   // std::cout << "Powering down camera... ";
   // m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_OFF);
@@ -70,7 +71,7 @@ int DC1394Wrapper::Init() {
   // std::cout << "Done." << std::endl;
 
   std::cout << "Setting ISO speed... ";
-  m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_400);
+  m_eErr=dc1394_video_set_iso_speed(m_pcCamera, DC1394_ISO_SPEED_100);
   CheckError(2);
   std::cout << "Done." << std::endl;
 
@@ -80,8 +81,13 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting frame rate... ";
-  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_30);
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_15);
   CheckError(4);
+  std::cout << "Done." << std::endl;
+
+  std::cout << "Setting trigger mode... ";
+  m_eErr=dc1394_external_trigger_set_mode(m_pcCamera, DC1394_TRIGGER_MODE_3);
+  CheckError(3);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting capture flags... ";
@@ -128,10 +134,21 @@ void DC1394Wrapper::StartTransmission() {
 }
 
 void DC1394Wrapper::StopTransmission() {
-  std::cout << "Stopping video transmission... ";
-  m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
-  CheckError(8);
-  std::cout << "Done." << std::endl;
+  if (m_bTransmissionStarted) {
+    std::cout << "Stopping video transmission... ";
+    m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
+    CheckError(8);
+    std::cout << "Done." << std::endl;
+  }
+}
+
+void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
+  if (m_bTransmissionStarted) {
+    StopTransmission();
+  }
+
+  dc1394_capture_stop(m_pcCamera);
+  dc1394_camera_free(m_pcCamera);
 }
 
 void DC1394Wrapper::Close() {

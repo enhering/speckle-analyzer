@@ -20,6 +20,8 @@ using namespace cv;
 Mat result;
 int g_nMouseX, g_nMouseY;
 
+int g_nNumBytesPerPixel = 2;
+
 const int g_nNumPlotPoints = 1000;
 double g_fXData[g_nNumPlotPoints];
 double g_fYData[g_nNumPlotPoints];
@@ -30,7 +32,7 @@ int g_ImageHeight, g_ImageWidth;
 
 DC1394Wrapper g_cDC1394Wrapper;
 
-Mat cFrame1;
+Mat cFrame1, cFrame2;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -49,11 +51,61 @@ static void onMouse(int event,int x,int y,int,void*) {
   g_bEraseAllData = true;
 }
 
+cv::Mat CaptureImage() {
+  g_cDC1394Wrapper.Grab();
+
+  g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
+  g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+
+  std::cout << "Frame1  data: width=" 
+            << g_ImageWidth 
+            << " height=" 
+            << g_ImageHeight 
+            << " size " 
+            << g_cDC1394Wrapper.GetImageSize()
+            << "bytes." << std::endl;
+
+  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
+  Mat cFrame;
+
+  if (pFrameAddress == NULL) {
+    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);  
+    return cFrame;
+  }
+
+#define METHOD2 
+
+#ifdef METHOD1
+  for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * g_nNumBytesPerPixel + ((nX * g_nNumBytesPerPixel)+0))); // 16bit value
+      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * g_nNumBytesPerPixel + ((nX * g_nNumBytesPerPixel)+1))); // 16bit value
+      uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
+
+      // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
+
+      cFrame.at<short>(nY,nX) = nPixelValue;
+    }
+  }
+#endif
+
+#ifdef METHOD2
+  if (pFrameAddress != NULL) {
+    cFrame.create(Size(g_ImageWidth, 
+                    g_ImageHeight), 
+                    CV_16UC1);
+    cFrame.data = g_cDC1394Wrapper.GetImage();
+  }
+#endif
+
+  return cFrame;
+}
+
 int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
-  int nNumBytesPerPixel = 2;
+
   
   TApplication  app("app", &argc, argv);
   TCanvas       canvas("a", "b", 500, 700, 400, 200);
@@ -74,33 +126,7 @@ int main(int argc, char* argv[]) {
 
   g_cDC1394Wrapper.Init();
   
-  g_cDC1394Wrapper.Grab();
-
-  g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
-  g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
-
-  std::cout << "Frame1  data: width=" 
-            << g_ImageWidth 
-            << " height=" 
-            << g_ImageHeight 
-            << " size " 
-            << g_cDC1394Wrapper.GetImageSize()
-            << "bytes." << std::endl;
-
-  Mat cFrame1 = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC1);
-  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
-
-  for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+0))); // 16bit value
-      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+1))); // 16bit value
-      uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
-
-      // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
-
-      cFrame1.at<short>(nX,nY) = nPixelValue;
-    }
-  }
+  cFrame1 = CaptureImage().clone();
 
   namedWindow("result",1);
   namedWindow("Current",1);
@@ -116,33 +142,7 @@ int main(int argc, char* argv[]) {
   while(1) {
     // cap >> frame1; // get a new frame from camera
 
-    g_cDC1394Wrapper.Grab();
-
-    g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
-    g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
-
-    std::cout << "Frame2  data: width=" 
-              << g_ImageWidth 
-              << " height=" 
-              << g_ImageHeight 
-              << " size " 
-              << g_cDC1394Wrapper.GetImageSize()
-              << "bytes." << std::endl;
-
-    Mat cFrame2 = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC1);
-    uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
-
-    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-        uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+0))); // 16bit value
-        uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * nNumBytesPerPixel + ((nX * nNumBytesPerPixel)+1))); // 16bit value
-        uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
-
-        // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
-
-        cFrame2.at<short>(nX,nY) = nPixelValue;
-      }
-    }
+    cFrame2 = CaptureImage().clone();
 
     cv::imwrite("Frame2.jpg", cFrame1, qualityType);
 
