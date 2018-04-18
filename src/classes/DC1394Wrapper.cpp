@@ -85,9 +85,12 @@ int DC1394Wrapper::Init() {
   CheckError(4);
   std::cout << "Done." << std::endl;
 
-  std::cout << "Setting trigger mode... ";
-  m_eErr=dc1394_external_trigger_set_mode(m_pcCamera, DC1394_TRIGGER_MODE_3);
-  CheckError(3);
+  std::cout << "Setting trigger... ";
+  // m_eErr = dc1394_external_trigger_set_mode(m_pcCamera, DC1394_TRIGGER_MODE_3);
+  m_eErr = dc1394_external_trigger_set_power(m_pcCamera, DC1394_ON);
+  CheckError(22);
+  m_eErr = dc1394_external_trigger_set_source(m_pcCamera, DC1394_TRIGGER_SOURCE_SOFTWARE);
+  CheckError(23);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting capture flags... ";
@@ -103,6 +106,11 @@ void DC1394Wrapper::Grab() {
   if (! m_bTransmissionStarted) {
     StartTransmission();
   }
+
+  std::cout << "Pullling trigger... ";
+  m_eErr = dc1394_software_trigger_set_power(m_pcCamera, DC1394_ON);
+  CheckError(24);
+  std::cout << "Ok" << std::endl;
 
   std::cout << "Capturing... " << std::endl;
   while (! bCaptureOK) {
