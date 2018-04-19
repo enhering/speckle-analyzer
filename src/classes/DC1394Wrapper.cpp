@@ -133,6 +133,11 @@ unsigned char * DC1394Wrapper::GetImage() {
   return m_pcFrame->image;
 }
 
+void DC1394Wrapper::ReleaseBuffer() {
+  m_eErr=dc1394_capture_enqueue(m_pcCamera, m_pcFrame);
+  CheckError(44);
+}
+
 void DC1394Wrapper::StartTransmission() {
   std::cout << "Starting video transmission... ";
   m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);

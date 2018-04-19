@@ -127,6 +127,7 @@ int main(int argc, char* argv[]) {
   g_cDC1394Wrapper.Init();
   
   cFrame1 = CaptureImage().clone();
+  g_cDC1394Wrapper.ReleaseBuffer();
 
   namedWindow("result",1);
   namedWindow("Current",1);
@@ -143,6 +144,7 @@ int main(int argc, char* argv[]) {
     // cap >> frame1; // get a new frame from camera
 
     cFrame2 = CaptureImage().clone();
+    g_cDC1394Wrapper.ReleaseBuffer();
 
     cv::imwrite("Frame2.jpg", cFrame1, qualityType);
 
