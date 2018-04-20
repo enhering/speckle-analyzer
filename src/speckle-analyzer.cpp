@@ -57,13 +57,13 @@ cv::Mat CaptureImage() {
   g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
   g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-  std::cout << "Frame1  data: width=" 
-            << g_ImageWidth 
-            << " height=" 
-            << g_ImageHeight 
-            << " size " 
-            << g_cDC1394Wrapper.GetImageSize()
-            << "bytes." << std::endl;
+  // std::cout << "Frame1  data: width=" 
+  //           << g_ImageWidth 
+  //           << " height=" 
+  //           << g_ImageHeight 
+  //           << " size " 
+  //           << g_cDC1394Wrapper.GetImageSize()
+  //           << "bytes." << std::endl;
 
   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRGBImage();
   Mat cFrame;
@@ -114,24 +114,24 @@ int main(int argc, char* argv[]) {
 
   setMouseCallback("Current", onMouse);
 
-  std::vector<int> qualityType;
-  qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
-  qualityType.push_back(90);
+  // std::vector<int> qualityType;
+  // qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
+  // qualityType.push_back(90);
 
-  cv::imwrite("Frame1.jpg", cFrame1, qualityType);
+  // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
 
   while(1) {
     // cap >> frame1; // get a new frame from camera
 
     cFrame2 = CaptureImage().clone();
 
-    cv::imwrite("Frame2.jpg", cFrame1, qualityType);
+    // cv::imwrite("Frame2.jpg", cFrame1, qualityType);
 
     subtract(cFrame1, cFrame2, result);
 
     Scalar intensity = cFrame1.at<uchar>(g_nMouseY, g_nMouseX);
 
-    //std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
+    std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
     int nPos;
 
