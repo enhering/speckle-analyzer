@@ -8,22 +8,24 @@
       DC1394Wrapper();
       ~DC1394Wrapper();
 
-      void Cleanup(dc1394camera_t *);
-
       int Init();
 
       void StartTransmission();
-      void StopTransmission();
 
       void Grab();
 
-      unsigned char * GetImage();
-      void ReleaseBuffer();
+      void AllocateRGBBuffer();
+      unsigned char * GetRGBImage();
       uint32_t GetImageWidth()  { return m_pcFrame->size[0]; }
       uint32_t GetImageHeight() { return m_pcFrame->size[1]; }
       uint32_t GetImageSize()   { return m_pcFrame->image_bytes; }
 
       void  CheckError(int);
+
+      void StopTransmission();
+      void FreeRGBBuffer();
+      void Cleanup(dc1394camera_t *);
+
 
       void Close();
 
@@ -36,6 +38,9 @@
       dc1394_t            * m_pcD;
       dc1394camera_list_t * m_pcList;
       dc1394error_t         m_eErr;
+
+      unsigned char       * m_panRGBBuffer;
+      bool                  m_bRGBBufferAllocated;
 
       bool                  m_bTransmissionStarted;
 

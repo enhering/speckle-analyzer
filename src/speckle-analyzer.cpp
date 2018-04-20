@@ -65,38 +65,19 @@ cv::Mat CaptureImage() {
             << g_cDC1394Wrapper.GetImageSize()
             << "bytes." << std::endl;
 
-  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetImage();
+  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRGBImage();
   Mat cFrame;
 
   if (pFrameAddress == NULL) {
-    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);  
+    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
     return cFrame;
   }
-
-#define METHOD2 
-
-#ifdef METHOD1
-  for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      uint16_t nPixelValueH = * (pFrameAddress + (nY * g_ImageWidth * g_nNumBytesPerPixel + ((nX * g_nNumBytesPerPixel)+0))); // 16bit value
-      uint16_t nPixelValueL = * (pFrameAddress + (nY * g_ImageWidth * g_nNumBytesPerPixel + ((nX * g_nNumBytesPerPixel)+1))); // 16bit value
-      uint16_t nPixelValue  = nPixelValueL + (nPixelValueH << 8);
-
-      // std::cout << "(" << nX << ", " << nY << ", " << nPixelValue << ") ";
-
-      cFrame.at<short>(nY,nX) = nPixelValue;
-    }
-  }
-#endif
-
-#ifdef METHOD2
-  if (pFrameAddress != NULL) {
+  else {
     cFrame.create(Size(g_ImageWidth, 
-                    g_ImageHeight), 
-                    CV_16UC1);
-    cFrame.data = g_cDC1394Wrapper.GetImage();
+                       g_ImageHeight), 
+                       CV_16UC3);
+    cFrame.data = pFrameAddress;
   }
-#endif
 
   return cFrame;
 }
@@ -127,7 +108,6 @@ int main(int argc, char* argv[]) {
   g_cDC1394Wrapper.Init();
   
   cFrame1 = CaptureImage().clone();
-  g_cDC1394Wrapper.ReleaseBuffer();
 
   namedWindow("result",1);
   namedWindow("Current",1);
@@ -144,7 +124,6 @@ int main(int argc, char* argv[]) {
     // cap >> frame1; // get a new frame from camera
 
     cFrame2 = CaptureImage().clone();
-    g_cDC1394Wrapper.ReleaseBuffer();
 
     cv::imwrite("Frame2.jpg", cFrame1, qualityType);
 

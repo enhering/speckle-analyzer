@@ -10,6 +10,7 @@ DC1394Wrapper::DC1394Wrapper() {
 
   m_pcFrame = NULL;
   m_bTransmissionStarted = false;
+  m_bRGBBufferAllocated = false;
 }
 
 DC1394Wrapper::~DC1394Wrapper() {
@@ -94,6 +95,45 @@ int DC1394Wrapper::Init() {
   // CheckError(23);
   std::cout << "Done." << std::endl;
 
+
+  std::cout << "Setting features: ";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 0);
+  std::cout << "-";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_EXPOSURE, 256);
+  std::cout << "/";
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHARPNESS, 0);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_BALANCE, 0);
+  std::cout << "|";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_HUE, 1792);
+  std::cout << "\\";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SATURATION, 64);
+  std::cout << "-";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 0);
+  std::cout << "/";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 3);
+  std::cout << "|";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 0);
+  std::cout << "\\";
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_IRIS, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FOCUS, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TEMPERATURE, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TRIGGER, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TRIGGER_DELAY, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_SHADING, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FRAME_RATE, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_ZOOM, 0);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 0);
+  std::cout << "-";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 0);
+  std::cout << "/";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_OPTICAL_FILTER, 0);
+  std::cout << "|";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_CAPTURE_SIZE, 0);
+  std::cout << "\\";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_CAPTURE_QUALITY, 0);
+  std::cout << "_ ";
+  std::cout << "Done." << std::endl;
+
   std::cout << "Setting capture flags... ";
   m_eErr=dc1394_capture_setup(m_pcCamera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
   CheckError(5);
@@ -129,13 +169,31 @@ void DC1394Wrapper::Grab() {
   std::cout << "Done." << std::endl;
 }
 
-unsigned char * DC1394Wrapper::GetImage() {
-  return m_pcFrame->image;
+void DC1394Wrapper::AllocateRGBBuffer() {
+  FreeRGBBuffer();  
+  uint32_t nBufferSize = m_pcFrame->image_bytes * 3;
+  m_panRGBBuffer = (unsigned char *) malloc(nBufferSize);
+  m_bRGBBufferAllocated = true;  
 }
 
-void DC1394Wrapper::ReleaseBuffer() {
-  m_eErr=dc1394_capture_enqueue(m_pcCamera, m_pcFrame);
+unsigned char * DC1394Wrapper::GetRGBImage() {
+  AllocateRGBBuffer();
+
+  uint32_t nBufferSize = m_pcFrame->image_bytes * 3;
+
+
+  m_eErr = dc1394_bayer_decoding_16bit((uint16_t * ) m_pcFrame->image, 
+                                       (uint16_t * ) m_panRGBBuffer,
+                                       m_pcFrame->size[0],
+                                       m_pcFrame->size[1],
+                                       DC1394_COLOR_FILTER_RGGB,
+                                       DC1394_BAYER_METHOD_BILINEAR,
+                                       16);
+  CheckError(43);
+  m_eErr = dc1394_capture_enqueue(m_pcCamera, m_pcFrame);
   CheckError(44);
+
+  return m_panRGBBuffer;
 }
 
 void DC1394Wrapper::StartTransmission() {
@@ -147,7 +205,15 @@ void DC1394Wrapper::StartTransmission() {
   m_bTransmissionStarted = true;
 }
 
+void DC1394Wrapper::FreeRGBBuffer() {
+  if (m_bRGBBufferAllocated) {
+    free(m_panRGBBuffer);
+  }
+  m_bRGBBufferAllocated = false;
+}
+
 void DC1394Wrapper::StopTransmission() {
+
   if (m_bTransmissionStarted) {
     std::cout << "Stopping video transmission... ";
     m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_OFF);
@@ -157,9 +223,9 @@ void DC1394Wrapper::StopTransmission() {
 }
 
 void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
-  if (m_bTransmissionStarted) {
-    StopTransmission();
-  }
+
+  FreeRGBBuffer();
+  StopTransmission();
 
   dc1394_capture_stop(m_pcCamera);
   dc1394_camera_free(m_pcCamera);
