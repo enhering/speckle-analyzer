@@ -176,6 +176,17 @@ void DC1394Wrapper::AllocateRGBBuffer() {
   m_bRGBBufferAllocated = true;  
 }
 
+unsigned char * DC1394Wrapper::GetRawImage() {
+
+  return m_pcFrame->image;
+}
+
+void DC1394Wrapper::ReleaseFrame() {
+  // Only necessary after GetRawImage
+  m_eErr = dc1394_capture_enqueue(m_pcCamera, m_pcFrame);
+  CheckError(44);
+}
+
 unsigned char * DC1394Wrapper::GetRGBImage() {
   AllocateRGBBuffer();
 

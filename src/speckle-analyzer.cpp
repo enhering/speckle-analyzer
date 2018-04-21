@@ -17,7 +17,6 @@
 
 using namespace cv;
 
-Mat result;
 int g_nMouseX, g_nMouseY;
 
 int g_nNumBytesPerPixel = 2;
@@ -31,8 +30,6 @@ bool g_bEraseAllData;
 int g_ImageHeight, g_ImageWidth;
 
 DC1394Wrapper g_cDC1394Wrapper;
-
-Mat cFrame1, cFrame2;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -65,20 +62,19 @@ cv::Mat CaptureImage() {
   //           << g_cDC1394Wrapper.GetImageSize()
   //           << "bytes." << std::endl;
 
-  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRGBImage();
+  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRawImage();
   Mat cFrame;
 
   if (pFrameAddress == NULL) {
-    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
+    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);  
     return cFrame;
   }
   else {
     cFrame.create(Size(g_ImageWidth, 
                        g_ImageHeight), 
-                       CV_16UC3);
+                       CV_16UC1);
     cFrame.data = pFrameAddress;
   }
-
   return cFrame;
 }
 
@@ -86,7 +82,10 @@ int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
+  Mat cFrame1, cFrame2, result;
+  Mat cData;
 
+  bool bFirstRun = true;
   
   TApplication  app("app", &argc, argv);
   TCanvas       canvas("a", "b", 500, 700, 400, 200);
@@ -108,15 +107,19 @@ int main(int argc, char* argv[]) {
   g_cDC1394Wrapper.Init();
   
   cFrame1 = CaptureImage().clone();
+  g_cDC1394Wrapper.ReleaseFrame();
+
+  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
 
   namedWindow("result",1);
   namedWindow("Current",1);
+  namedWindow("Data",1);
 
   setMouseCallback("Current", onMouse);
 
-  // std::vector<int> qualityType;
-  // qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
-  // qualityType.push_back(90);
+  std::vector<int> qualityType;
+  qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
+  qualityType.push_back(90);
 
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
 
@@ -124,12 +127,35 @@ int main(int argc, char* argv[]) {
     // cap >> frame1; // get a new frame from camera
 
     cFrame2 = CaptureImage().clone();
+    g_cDC1394Wrapper.ReleaseFrame();
 
     // cv::imwrite("Frame2.jpg", cFrame1, qualityType);
 
     subtract(cFrame1, cFrame2, result);
 
-    Scalar intensity = cFrame1.at<uchar>(g_nMouseY, g_nMouseX);
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+        Scalar intensity = cFrame2.at<uchar>(nY, nX);
+
+        if (bFirstRun) {
+          cData.at<Vec3s>(nX,nY)[0] = cFrame1.at<ushort>(nX,nY); // min
+          cData.at<Vec3s>(nX,nY)[1] = cFrame1.at<ushort>(nX,nY); // max
+          cData.at<Vec3s>(nX,nY)[2] = 0; // amplitude
+          bFirstRun = false;
+        }
+        else {
+          if (cFrame1.at<ushort>(nX,nY) < cData.at<Vec3s>(nX,nY)[0] ) {
+            cData.at<Vec3s>(nX,nY)[0] = cFrame1.at<ushort>(nX,nY); // min
+          }
+          if (cFrame1.at<ushort>(nX,nY) > cData.at<Vec3s>(nX,nY)[1]) {
+            cData.at<Vec3s>(nX,nY)[1] = cFrame1.at<ushort>(nX,nY); // max
+          }
+          cData.at<Vec3s>(nX,nY)[2] = cData.at<Vec3s>(nX,nY)[1] - cData.at<Vec3s>(nX,nY)[0]; // amplitude
+        }
+      }
+    }
+
+    Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
 
     std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
@@ -170,13 +196,16 @@ int main(int argc, char* argv[]) {
     //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
     // Canny(result, result, 0, 30, 3);
 
-    imshow("result", result);
-    imshow("Current", cFrame2);
+    // imshow("result", result);
+    // imshow("Current", cFrame2);
+    // imshow("Data", cData);
 
     gSystem->ProcessEvents();
 
     if (waitKey(30) >= 0) break;
   }
+
+  cv::imwrite("Data.jpg", cData, qualityType);
   // the camera will be deinitialized automatically in VideoCapture destructor
 
   g_cDC1394Wrapper.Close();
