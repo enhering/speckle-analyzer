@@ -111,11 +111,11 @@ int main(int argc, char* argv[]) {
 
   cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
 
-  namedWindow("result",1);
-  namedWindow("Current",1);
-  namedWindow("Data",1);
+  // namedWindow("result",1);
+  // namedWindow("Current",1);
+  // namedWindow("Data",1);
 
-  setMouseCallback("Current", onMouse);
+  // setMouseCallback("Current", onMouse);
 
   std::vector<int> qualityType;
   qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -155,7 +155,8 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
+    // Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
+    Scalar intensity = cFrame2.at<ushort>(g_nMouseY, 200, 200);
 
     std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
