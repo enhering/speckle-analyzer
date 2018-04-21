@@ -234,9 +234,11 @@ void DC1394Wrapper::StopTransmission() {
 void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
 
   FreeRGBBuffer();
-  StopTransmission();
 
   dc1394_capture_stop(m_pcCamera);
+
+  StopTransmission();
+
   dc1394_camera_free(m_pcCamera);
 }
 
