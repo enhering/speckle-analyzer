@@ -50,10 +50,10 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
 
-  // std::cout << "Resetting bus... ";
-  // m_eErr =  dc1394_reset_bus(m_pcCamera);
-  // CheckError(20);
-  // std::cout << "Done." << std::endl;
+  std::cout << "Resetting bus... ";
+  m_eErr =  dc1394_reset_bus(m_pcCamera);
+  CheckError(20);
+  std::cout << "Done." << std::endl;
 
   // 
   // std::cout << "Powering down camera... ";
