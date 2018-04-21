@@ -87,22 +87,22 @@ int main(int argc, char* argv[]) {
 
   bool bFirstRun = true;
   
-  TApplication  app("app", &argc, argv);
-  TCanvas       canvas("a", "b", 500, 700, 400, 200);
-  TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
+  // TApplication  app("app", &argc, argv);
+  // TCanvas       canvas("a", "b", 500, 700, 400, 200);
+  // TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
 
-  graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
+  // graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
   
-  graph.SetMarkerStyle(2);
-  graph.SetMarkerColor(4);
-  graph.SetMarkerSize(0.3);
+  // graph.SetMarkerStyle(2);
+  // graph.SetMarkerColor(4);
+  // graph.SetMarkerSize(0.3);
 
-  graph.SetLineColor(4);
-  graph.SetLineWidth(1);
+  // graph.SetLineColor(4);
+  // graph.SetLineWidth(1);
 
-  graph.GetXaxis()->SetNdivisions(5, kTRUE);
+  // graph.GetXaxis()->SetNdivisions(5, kTRUE);
 
-  graph.Draw("APL");
+  // graph.Draw("APL");
 
   g_cDC1394Wrapper.Init();
   
@@ -162,46 +162,45 @@ int main(int argc, char* argv[]) {
 
     int nPos;
 
-    if (g_bEraseAllData) {
-      for(int nI = 0; nI <= g_nNumPlotPoints - 1; nI++) {
-        graph.SetPoint(nI, nI, 0);
-      }
-      g_nNumDataPoint = 0;
-      g_bEraseAllData = false;
-    }
-    else {
-      if (g_nNumDataPoint >= g_nNumPlotPoints) {
-        for(int nI = 0; nI <= (g_nNumPlotPoints - 2); nI++) {
-          g_fXData[nI] = g_fXData[nI + 1];
-          g_fYData[nI] = g_fYData[nI + 1];
-          graph.SetPoint(nI, g_fXData[nI], g_fYData[nI]);
-        }
-        nPos = g_nNumPlotPoints - 1;
-        g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (int) intensity.val[0];
-      }
-      else {
-        nPos = g_nNumDataPoint;
-        g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (int) intensity.val[0];
-      }
+    // if (g_bEraseAllData) {
+    //   for(int nI = 0; nI <= g_nNumPlotPoints - 1; nI++) {
+    //     graph.SetPoint(nI, nI, 0);
+    //   }
+    //   g_nNumDataPoint = 0;
+    //   g_bEraseAllData = false;
+    // }
+    // else {
+    //   if (g_nNumDataPoint >= g_nNumPlotPoints) {
+    //     for(int nI = 0; nI <= (g_nNumPlotPoints - 2); nI++) {
+    //       g_fXData[nI] = g_fXData[nI + 1];
+    //       g_fYData[nI] = g_fYData[nI + 1];
+    //       graph.SetPoint(nI, g_fXData[nI], g_fYData[nI]);
+    //     }
+    //     nPos = g_nNumPlotPoints - 1;
+    //     g_fXData[nPos] = g_nNumDataPoint;
+    //     g_fYData[nPos] = (int) intensity.val[0];
+    //   }
+    //   else {
+    //     nPos = g_nNumDataPoint;
+    //     g_fXData[nPos] = g_nNumDataPoint;
+    //     g_fYData[nPos] = (int) intensity.val[0];
+    //   }
       
-      graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
-      g_nNumDataPoint++;
-    }
+    //   graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
+    //   g_nNumDataPoint++;
+    // }
 
-    graph.Draw("APL");
-    canvas.Update();
-
-    // cvtColor(frame, result, CV_BGR2GRAY);
-    //GaussianBlur(result, result, Size(7,7), 1.5, 1.5);
-    // Canny(result, result, 0, 30, 3);
+    // graph.Draw("APL");
+    // canvas.Update();
 
     // imshow("result", result);
     // imshow("Current", cFrame2);
     // imshow("Data", cData);
 
-    gSystem->ProcessEvents();
+    // gSystem->ProcessEvents();
+
+    g_nNumDataPoint++;
+    if (g_nNumDataPoint > 10) break;
 
     if (waitKey(30) >= 0) break;
   }
