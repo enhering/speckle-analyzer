@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
-    Scalar intensity = cFrame2.at<ushort>(g_nMouseY, 200, 200);
+    Scalar intensity = cFrame2.at<ushort>(200, 200);
 
     std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
