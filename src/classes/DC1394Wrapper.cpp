@@ -148,12 +148,12 @@ void DC1394Wrapper::Grab() {
     StartTransmission();
   }
 
-  // std::cout << "Pullling trigger... ";
+  std::cout << "Pullling trigger... ";
   m_eErr = dc1394_software_trigger_set_power(m_pcCamera, DC1394_ON);
   CheckError(24);
-  // std::cout << "Ok" << std::endl;
+  std::cout << "Ok" << std::endl;
 
-  // std::cout << "Capturing... " << std::endl;
+  std::cout << "Capturing... ";
   while (! bCaptureOK) {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
@@ -166,7 +166,7 @@ void DC1394Wrapper::Grab() {
     }
     usleep(1000);
   }
-  // std::cout << "Done." << std::endl;
+  std::cout << "Done." << std::endl;
 }
 
 void DC1394Wrapper::AllocateRGBBuffer() {
