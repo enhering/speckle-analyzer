@@ -102,7 +102,7 @@ int DC1394Wrapper::Init() {
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_EXPOSURE, 256);
   std::cout << "/";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHARPNESS, 0);
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_BALANCE, 0);
+  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_BALANCE, 0);
   std::cout << "|";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_HUE, 1792);
   std::cout << "\\";

@@ -138,19 +138,19 @@ int main(int argc, char* argv[]) {
         Scalar intensity = cFrame2.at<uchar>(nY, nX);
 
         if (bFirstRun) {
-          cData.at<Vec3s>(nX,nY)[0] = cFrame1.at<ushort>(nX,nY); // min
-          cData.at<Vec3s>(nX,nY)[1] = cFrame1.at<ushort>(nX,nY); // max
-          cData.at<Vec3s>(nX,nY)[2] = 0; // amplitude
+          cData.at<Vec3s>(nY,nX)[0] = cFrame1.at<ushort>(nY,nX); // min
+          cData.at<Vec3s>(nY,nX)[1] = cFrame1.at<ushort>(nY,nX); // max
+          cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
           bFirstRun = false;
         }
         else {
-          if (cFrame1.at<ushort>(nX,nY) < cData.at<Vec3s>(nX,nY)[0] ) {
-            cData.at<Vec3s>(nX,nY)[0] = cFrame1.at<ushort>(nX,nY); // min
+          if (cFrame1.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
+            cData.at<Vec3s>(nY,nX)[0] = cFrame1.at<ushort>(nY,nX); // min
           }
-          if (cFrame1.at<ushort>(nX,nY) > cData.at<Vec3s>(nX,nY)[1]) {
-            cData.at<Vec3s>(nX,nY)[1] = cFrame1.at<ushort>(nX,nY); // max
+          if (cFrame1.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
+            cData.at<Vec3s>(nY,nX)[1] = cFrame1.at<ushort>(nY,nX); // max
           }
-          cData.at<Vec3s>(nX,nY)[2] = cData.at<Vec3s>(nX,nY)[1] - cData.at<Vec3s>(nX,nY)[0]; // amplitude
+          cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
         }
       }
     }
