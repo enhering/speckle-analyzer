@@ -97,7 +97,7 @@ int DC1394Wrapper::Init() {
 
 
   std::cout << "Setting features: ";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 300);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 350);
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_EXPOSURE, 256);
   std::cout << "/";
@@ -110,9 +110,9 @@ int DC1394Wrapper::Init() {
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 1);
   std::cout << "/";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 200);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 3);
   std::cout << "|";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 20);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 0);
   std::cout << "\\";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_IRIS, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FOCUS, 0);
@@ -122,16 +122,16 @@ int DC1394Wrapper::Init() {
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_SHADING, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FRAME_RATE, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_ZOOM, 0);
-  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 0);
-  // std::cout << "-";
-  // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 0);
-  // std::cout << "/";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 0);
+  std::cout << "-";
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 0);
+  std::cout << "/";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_OPTICAL_FILTER, 0);
-  // std::cout << "|";
+  std::cout << "|";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_CAPTURE_SIZE, 0);
-  // std::cout << "\\";
+  std::cout << "\\";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_CAPTURE_QUALITY, 0);
-  // std::cout << "_ ";
+  std::cout << "_ ";
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting capture flags... ";
@@ -148,17 +148,17 @@ void DC1394Wrapper::Grab() {
     StartTransmission();
   }
 
-  std::cout << "Pullling trigger... ";
+  // std::cout << "Pullling trigger... ";
   m_eErr = dc1394_software_trigger_set_power(m_pcCamera, DC1394_ON);
   CheckError(24);
-  std::cout << "Ok" << std::endl;
+  // std::cout << "Ok" << std::endl;
 
-  std::cout << "Capturing... " << std::endl;
+  // std::cout << "Capturing... " << std::endl;
   while (! bCaptureOK) {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
     if (m_pcFrame == NULL) {
-      std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
+      // std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
     }
     else {
       bCaptureOK = true;
@@ -166,7 +166,7 @@ void DC1394Wrapper::Grab() {
     }
     usleep(1000);
   }
-  std::cout << "Done." << std::endl;
+  // std::cout << "Done." << std::endl;
 }
 
 void DC1394Wrapper::AllocateRGBBuffer() {
@@ -181,12 +181,11 @@ unsigned char * DC1394Wrapper::GetRGBImage() {
 
   uint32_t nBufferSize = m_pcFrame->image_bytes * 3;
 
-
   m_eErr = dc1394_bayer_decoding_16bit((uint16_t * ) m_pcFrame->image, 
                                        (uint16_t * ) m_panRGBBuffer,
                                        m_pcFrame->size[0],
                                        m_pcFrame->size[1],
-                                       DC1394_COLOR_FILTER_GBRG,
+                                       DC1394_COLOR_FILTER_RGGB,
                                        DC1394_BAYER_METHOD_BILINEAR,
                                        16);
   CheckError(43);
