@@ -97,7 +97,7 @@ int DC1394Wrapper::Init() {
 
 
   std::cout << "Setting features: ";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 350);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 428);
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_EXPOSURE, 256);
   std::cout << "/";
@@ -110,7 +110,7 @@ int DC1394Wrapper::Init() {
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 1);
   std::cout << "/";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 3);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 200);
   std::cout << "|";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 0);
   std::cout << "\\";

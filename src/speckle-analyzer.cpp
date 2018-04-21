@@ -130,8 +130,6 @@ int main(int argc, char* argv[]) {
 
 
   while(1) {
-    // cap >> frame1; // get a new frame from camera
-
     cFrame2 = CaptureImage().clone();
     g_cDC1394Wrapper.ReleaseFrame();
 
