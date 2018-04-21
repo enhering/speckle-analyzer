@@ -50,10 +50,10 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
 
-  std::cout << "Resetting bus... ";
-  m_eErr =  dc1394_reset_bus(m_pcCamera);
-  CheckError(20);
-  std::cout << "Done." << std::endl;
+  // std::cout << "Resetting bus... ";
+  // m_eErr =  dc1394_reset_bus(m_pcCamera);
+  // CheckError(20);
+  // std::cout << "Done." << std::endl;
 
   // 
   // std::cout << "Powering down camera... ";
@@ -158,13 +158,13 @@ void DC1394Wrapper::Grab() {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
     if (m_pcFrame == NULL) {
-      // std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
+      std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
+      usleep(1000);
     }
     else {
       bCaptureOK = true;
       break;
     }
-    usleep(1000);
   }
   std::cout << "Done." << std::endl;
 }
@@ -177,7 +177,6 @@ void DC1394Wrapper::AllocateRGBBuffer() {
 }
 
 unsigned char * DC1394Wrapper::GetRawImage() {
-
   return m_pcFrame->image;
 }
 

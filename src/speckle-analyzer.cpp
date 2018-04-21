@@ -123,6 +123,12 @@ int main(int argc, char* argv[]) {
 
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
 
+  g_cDC1394Wrapper.ReleaseFrame();
+  g_cDC1394Wrapper.ReleaseFrame();
+  g_cDC1394Wrapper.ReleaseFrame();
+  g_cDC1394Wrapper.ReleaseFrame();
+
+
   while(1) {
     // cap >> frame1; // get a new frame from camera
 
