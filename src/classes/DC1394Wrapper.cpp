@@ -11,6 +11,7 @@ DC1394Wrapper::DC1394Wrapper() {
   m_pcFrame = NULL;
   m_bTransmissionStarted = false;
   m_bRGBBufferAllocated = false;
+  m_bCameraInitialized = false;
 }
 
 DC1394Wrapper::~DC1394Wrapper() {
@@ -138,15 +139,22 @@ int DC1394Wrapper::Init() {
   m_eErr=dc1394_capture_setup(m_pcCamera,4, DC1394_CAPTURE_FLAGS_DEFAULT);
   CheckError(5);
   std::cout << "Done." << std::endl;
+
+  std::cout << "Starting video transmission... ";
+  m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
+  CheckError(7);
+  std::cout << "Done." << std::endl;
+  m_bTransmissionStarted = true;
+  m_bCameraInitialized = true;
 }
 
 void DC1394Wrapper::Grab() {
 
-  bool bCaptureOK = false;
-
-  if (! m_bTransmissionStarted) {
-    StartTransmission();
+  if (! m_bCameraInitialized) {
+    Init();
   }
+
+  bool bCaptureOK = false;
 
   std::cout << "Pullling trigger... ";
   m_eErr = dc1394_software_trigger_set_power(m_pcCamera, DC1394_ON);
@@ -205,15 +213,6 @@ unsigned char * DC1394Wrapper::GetRGBImage() {
   return m_panRGBBuffer;
 }
 
-void DC1394Wrapper::StartTransmission() {
-  std::cout << "Starting video transmission... ";
-  m_eErr=dc1394_video_set_transmission(m_pcCamera, DC1394_ON);
-  CheckError(7);
-  std::cout << "Done." << std::endl;
-
-  m_bTransmissionStarted = true;
-}
-
 void DC1394Wrapper::FreeRGBBuffer() {
   if (m_bRGBBufferAllocated) {
     free(m_panRGBBuffer);
@@ -232,14 +231,12 @@ void DC1394Wrapper::StopTransmission() {
 }
 
 void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
-
   FreeRGBBuffer();
-
-  dc1394_capture_stop(m_pcCamera);
-
   StopTransmission();
 
+  dc1394_capture_stop(m_pcCamera);
   dc1394_camera_free(m_pcCamera);
+  dc1394_free(m_pcD);
 }
 
 void DC1394Wrapper::Close() {

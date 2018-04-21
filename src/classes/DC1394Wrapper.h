@@ -10,8 +10,6 @@
 
       int Init();
 
-      void StartTransmission();
-
       void Grab();
 
       void AllocateRGBBuffer();
@@ -45,6 +43,7 @@
       bool                  m_bRGBBufferAllocated;
 
       bool                  m_bTransmissionStarted;
+      bool                  m_bCameraInitialized;
 
   };
 
