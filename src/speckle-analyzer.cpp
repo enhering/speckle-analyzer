@@ -208,7 +208,8 @@ int main(int argc, char* argv[]) {
     if (waitKey(30) >= 0) break;
   }
 
-  cv::imwrite("Data.jpg", cData, qualityType);
+  // cv::imwrite("Data.jpg", cData, qualityType);
+  bool success = cv::imwrite("Data.tiff", cData);
   // the camera will be deinitialized automatically in VideoCapture destructor
 
   g_cDC1394Wrapper.Close();
