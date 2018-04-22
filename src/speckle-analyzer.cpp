@@ -109,8 +109,7 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
-
-  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
+  cData = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC3);  
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
@@ -133,12 +132,6 @@ int main(int argc, char* argv[]) {
   qualityType.push_back(90);
 
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
-
-  g_cDC1394Wrapper.ReleaseFrame();
-  g_cDC1394Wrapper.ReleaseFrame();
-  g_cDC1394Wrapper.ReleaseFrame();
-  g_cDC1394Wrapper.ReleaseFrame();
-
 
   while(1) {
     cFrame2 = CaptureImage().clone();
