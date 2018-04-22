@@ -115,15 +115,15 @@ int main(int argc, char* argv[]) {
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      std::cout << "(" << nX << "," << nY << ")"<< std::endl;
-      Scalar intensity = cFrame2.at<uchar>(nY, nX);
+      // std::cout << "(" << nX << "," << nY << ")"<< std::endl;
+      Scalar intensity = cFrame1.at<uchar>(nY, nX);
 
       cData.at<Vec3s>(nY,nX)[0] = 32767; // min
       cData.at<Vec3s>(nY,nX)[1] = 0; // max
       cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
     }
   }
-
+  std::cout << "Done." << std::endl;
   // namedWindow("result",1);
   // namedWindow("Current",1);
   // namedWindow("Data",1);
