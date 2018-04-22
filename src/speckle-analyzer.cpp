@@ -142,8 +142,8 @@ int main(int argc, char* argv[]) {
         Scalar intensity = cFrame2.at<uchar>(nY, nX);
 
         if (bFirstRun) {
-          cData.at<Vec3s>(nY,nX)[0] = cFrame1.at<ushort>(nY,nX); // min
-          cData.at<Vec3s>(nY,nX)[1] = cFrame1.at<ushort>(nY,nX); // max
+          cData.at<Vec3s>(nY,nX)[0] = 1024; // min
+          cData.at<Vec3s>(nY,nX)[1] = 0; // max
           cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
           bFirstRun = false;
         }
