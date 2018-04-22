@@ -109,7 +109,18 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
+
   cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
+
+  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      Scalar intensity = cFrame2.at<uchar>(nY, nX);
+
+      cData.at<Vec3s>(nY,nX)[0] = 32767; // min
+      cData.at<Vec3s>(nY,nX)[1] = 0; // max
+      cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
+    }
+  }
 
   // namedWindow("result",1);
   // namedWindow("Current",1);
@@ -141,21 +152,13 @@ int main(int argc, char* argv[]) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
         Scalar intensity = cFrame2.at<uchar>(nY, nX);
 
-        if (bFirstRun) {
-          cData.at<Vec3s>(nY,nX)[0] = 1024; // min
-          cData.at<Vec3s>(nY,nX)[1] = 0; // max
-          cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
-          bFirstRun = false;
+        if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
+          cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
         }
-        else {
-          if (cFrame1.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
-            cData.at<Vec3s>(nY,nX)[0] = cFrame1.at<ushort>(nY,nX); // min
-          }
-          if (cFrame1.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
-            cData.at<Vec3s>(nY,nX)[1] = cFrame1.at<ushort>(nY,nX); // max
-          }
-          cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
+        if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
+          cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
+        cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
       }
     }
 
