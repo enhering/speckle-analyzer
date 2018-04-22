@@ -15,7 +15,9 @@ DC1394Wrapper::DC1394Wrapper() {
 }
 
 DC1394Wrapper::~DC1394Wrapper() {
-  Cleanup(m_pcCamera);
+  if (m_bCameraInitialized) {
+    Cleanup(m_pcCamera);
+  }
 }
 
 int DC1394Wrapper::Init() {
@@ -237,6 +239,8 @@ void DC1394Wrapper::Cleanup(dc1394camera_t *camera) {
   dc1394_capture_stop(m_pcCamera);
   dc1394_camera_free(m_pcCamera);
   dc1394_free(m_pcD);
+
+  m_bCameraInitialized = false;
 }
 
 void DC1394Wrapper::Close() {
