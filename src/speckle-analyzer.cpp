@@ -116,8 +116,6 @@ int main(int argc, char* argv[]) {
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
       // std::cout << "(" << nX << "," << nY << ")"<< std::endl;
-      Scalar intensity = cFrame1.at<uchar>(nY, nX);
-
       cData.at<Vec3s>(nY,nX)[0] = 32767; // min
       cData.at<Vec3s>(nY,nX)[1] = 0; // max
       cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
@@ -146,7 +144,6 @@ int main(int argc, char* argv[]) {
 
     for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-        Scalar intensity = cFrame2.at<uchar>(nY, nX);
 
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
           cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
@@ -159,7 +156,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
-    Scalar intensity = cFrame2.at<ushort>(200, 200);
+    ushort intensity = cFrame2.at<ushort>(200, 200);
 
     std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
