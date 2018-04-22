@@ -80,7 +80,7 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO16);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_800x600_MONO16);
   CheckError(3);
   std::cout << "Done." << std::endl;
 
