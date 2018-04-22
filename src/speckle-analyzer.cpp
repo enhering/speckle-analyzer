@@ -109,10 +109,13 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
-  cData = cv::Mat::zeros(g_ImageWidth, g_ImageHeight, CV_16UC3);  
+  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC3);  
+
+  std::cout << "Initializing data matrix...";
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      std::cout << "(" << nX << "," << nY << ")"<< std::endl;
       Scalar intensity = cFrame2.at<uchar>(nY, nX);
 
       cData.at<Vec3s>(nY,nX)[0] = 32767; // min
