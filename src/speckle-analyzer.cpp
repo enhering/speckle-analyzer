@@ -151,10 +151,10 @@ int main(int argc, char* argv[]) {
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
           cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
         }
-        if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
-          cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
-        }
-        cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
+        // if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
+        //   cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
+        // }
+        // cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
       }
     }
 
@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
     // gSystem->ProcessEvents();
 
     g_nNumDataPoint++;
-    if (g_nNumDataPoint > 10) break;
+    if (g_nNumDataPoint > 100) break;
 
     if (waitKey(30) >= 0) break;
   }
