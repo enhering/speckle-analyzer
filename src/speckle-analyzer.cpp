@@ -87,22 +87,22 @@ int main(int argc, char* argv[]) {
 
   bool bFirstRun = true;
   
-  // TApplication  app("app", &argc, argv);
-  // TCanvas       canvas("a", "b", 500, 700, 400, 200);
-  // TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
+  TApplication  app("app", &argc, argv);
+  TCanvas       canvas("a", "b", 500, 700, 400, 200);
+  TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
 
-  // graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
+  graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
   
-  // graph.SetMarkerStyle(2);
-  // graph.SetMarkerColor(4);
-  // graph.SetMarkerSize(0.3);
+  graph.SetMarkerStyle(2);
+  graph.SetMarkerColor(4);
+  graph.SetMarkerSize(0.3);
 
-  // graph.SetLineColor(4);
-  // graph.SetLineWidth(1);
+  graph.SetLineColor(4);
+  graph.SetLineWidth(1);
 
-  // graph.GetXaxis()->SetNdivisions(5, kTRUE);
+  graph.GetXaxis()->SetNdivisions(5, kTRUE);
 
-  // graph.Draw("APL");
+  graph.Draw("APL");
 
   g_cDC1394Wrapper.Init();
   
@@ -116,17 +116,17 @@ int main(int argc, char* argv[]) {
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
       // std::cout << "(" << nX << "," << nY << ")"<< std::endl;
-      cData.at<Vec3s>(nY,nX)[0] = 32767; // min
+      cData.at<Vec3s>(nY,nX)[0] = 65534; // min
       cData.at<Vec3s>(nY,nX)[1] = 0; // max
       cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
     }
   }
   std::cout << "Done." << std::endl;
-  // namedWindow("result",1);
-  // namedWindow("Current",1);
-  // namedWindow("Data",1);
+  namedWindow("result",1);
+  namedWindow("Current",1);
+  namedWindow("Data",1);
 
-  // setMouseCallback("Current", onMouse);
+  setMouseCallback("Data", onMouse);
 
   std::vector<int> qualityType;
   qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -135,6 +135,9 @@ int main(int argc, char* argv[]) {
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
 
   while(1) {
+    cFrame1 = CaptureImage().clone();
+    g_cDC1394Wrapper.ReleaseFrame(); 
+
     cFrame2 = CaptureImage().clone();
     g_cDC1394Wrapper.ReleaseFrame();
 
@@ -146,61 +149,61 @@ int main(int argc, char* argv[]) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
 
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
-          cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
+          cData.at<Vec3s>(nY,nX)[0] = (unsigned short) cFrame2.at<ushort>(nY,nX); // min
         }
         if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
-          cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
+          cData.at<Vec3s>(nY,nX)[1] = (unsigned short) cFrame2.at<ushort>(nY,nX); // max
         }
         cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
       }
     }
 
-    // Scalar intensity = cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
-    ushort intensity = cFrame2.at<ushort>(200, 200);
+    
+    //ushort intensity = cFrame2.at<ushort>(200, 200);
 
-    std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
+    // std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
 
     int nPos;
 
-    // if (g_bEraseAllData) {
-    //   for(int nI = 0; nI <= g_nNumPlotPoints - 1; nI++) {
-    //     graph.SetPoint(nI, nI, 0);
-    //   }
-    //   g_nNumDataPoint = 0;
-    //   g_bEraseAllData = false;
-    // }
-    // else {
-    //   if (g_nNumDataPoint >= g_nNumPlotPoints) {
-    //     for(int nI = 0; nI <= (g_nNumPlotPoints - 2); nI++) {
-    //       g_fXData[nI] = g_fXData[nI + 1];
-    //       g_fYData[nI] = g_fYData[nI + 1];
-    //       graph.SetPoint(nI, g_fXData[nI], g_fYData[nI]);
-    //     }
-    //     nPos = g_nNumPlotPoints - 1;
-    //     g_fXData[nPos] = g_nNumDataPoint;
-    //     g_fYData[nPos] = (int) intensity.val[0];
-    //   }
-    //   else {
-    //     nPos = g_nNumDataPoint;
-    //     g_fXData[nPos] = g_nNumDataPoint;
-    //     g_fYData[nPos] = (int) intensity.val[0];
-    //   }
+    if (g_bEraseAllData) {
+      for(int nI = 0; nI <= g_nNumPlotPoints - 1; nI++) {
+        graph.SetPoint(nI, nI, 0);
+      }
+      g_nNumDataPoint = 0;
+      g_bEraseAllData = false;
+    }
+    else {
+      if (g_nNumDataPoint >= g_nNumPlotPoints) {
+        for(int nI = 0; nI <= (g_nNumPlotPoints - 2); nI++) {
+          g_fXData[nI] = g_fXData[nI + 1];
+          g_fYData[nI] = g_fYData[nI + 1];
+          graph.SetPoint(nI, g_fXData[nI], g_fYData[nI]);
+        }
+        nPos = g_nNumPlotPoints - 1;
+        g_fXData[nPos] = g_nNumDataPoint;
+        g_fYData[nPos] = (unsigned short) cData.at<Vec3s>(g_nMouseY, g_nMouseX)[1];
+      }
+      else {
+        nPos = g_nNumDataPoint;
+        g_fXData[nPos] = g_nNumDataPoint;
+        g_fYData[nPos] = (unsigned short) cData.at<Vec3s>(g_nMouseY, g_nMouseX)[1];
+      }
       
-    //   graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
-    //   g_nNumDataPoint++;
-    // }
+      graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
+      g_nNumDataPoint++;
+    }
 
-    // graph.Draw("APL");
-    // canvas.Update();
+    graph.Draw("APL");
+    canvas.Update();
 
-    // imshow("result", result);
-    // imshow("Current", cFrame2);
-    // imshow("Data", cData);
+    imshow("result", result);
+    imshow("Current", cFrame2);
+    imshow("Data", cData);
 
-    // gSystem->ProcessEvents();
+    gSystem->ProcessEvents();
 
-    g_nNumDataPoint++;
-    if (g_nNumDataPoint > 100) break;
+    // g_nNumDataPoint++;
+    //if (g_nNumDataPoint > 100) break;
 
     if (waitKey(30) >= 0) break;
   }
@@ -214,7 +217,7 @@ int main(int argc, char* argv[]) {
   }
 
   // cv::imwrite("Data.jpg", cData, qualityType);
-  bool success = cv::imwrite("Data.tiff", cData);
+  //bool success = cv::imwrite("Data.tiff", cData);
   // the camera will be deinitialized automatically in VideoCapture destructor
 
   g_cDC1394Wrapper.Close();

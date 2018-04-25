@@ -80,7 +80,7 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_800x600_MONO16);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO16);
   CheckError(3);
   std::cout << "Done." << std::endl;
 
@@ -100,20 +100,20 @@ int DC1394Wrapper::Init() {
 
 
   std::cout << "Setting features: ";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 428);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_BRIGHTNESS, 0);
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_EXPOSURE, 256);
   std::cout << "/";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHARPNESS, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_BALANCE, 0);
   std::cout << "|";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_HUE, 1792);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_HUE, 1952);
   std::cout << "\\";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SATURATION, 64);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SATURATION, 228);
   std::cout << "-";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 1);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 0);
   std::cout << "/";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 50);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 155);
   std::cout << "|";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 0);
   std::cout << "\\";
@@ -125,9 +125,9 @@ int DC1394Wrapper::Init() {
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_SHADING, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FRAME_RATE, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_ZOOM, 0);
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 0);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 319);
   std::cout << "-";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 0);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 66);
   std::cout << "/";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_OPTICAL_FILTER, 0);
   std::cout << "|";
@@ -158,12 +158,12 @@ void DC1394Wrapper::Grab() {
 
   bool bCaptureOK = false;
 
-  std::cout << "Pullling trigger... ";
+  // std::cout << "Pullling trigger... ";
   m_eErr = dc1394_software_trigger_set_power(m_pcCamera, DC1394_ON);
   CheckError(24);
-  std::cout << "Ok" << std::endl;
+  // std::cout << "Ok" << std::endl;
 
-  std::cout << "Capturing... " << std::endl;
+  // std::cout << "Capturing... " << std::endl;
   while (! bCaptureOK) {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
@@ -176,7 +176,7 @@ void DC1394Wrapper::Grab() {
       break;
     }
   }
-  std::cout << "Done." << std::endl;
+  // std::cout << "Done." << std::endl;
 }
 
 void DC1394Wrapper::AllocateRGBBuffer() {
