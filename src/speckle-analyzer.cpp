@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
   namedWindow("Current",1);
   namedWindow("Data",1);
 
-  setMouseCallback("Data", onMouse);
+  setMouseCallback("Current", onMouse);
 
   std::vector<int> qualityType;
   qualityType.push_back(CV_IMWRITE_JPEG_QUALITY);
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
           cData.at<Vec3f>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
         cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; // amplitude
-        
+
         // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
         //         << " min: " << cData.at<Vec3f>(nY,nX)[0] 
         //         << " max: " << cData.at<Vec3f>(nY,nX)[1]
@@ -187,12 +187,12 @@ int main(int argc, char* argv[]) {
         }
         nPos = g_nNumPlotPoints - 1;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cData.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cFrame2.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
       }
       else {
         nPos = g_nNumDataPoint;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cData.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cFrame2.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
       }
       
       graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
@@ -202,8 +202,8 @@ int main(int argc, char* argv[]) {
     graph.Draw("APL");
     canvas.Update();
 
-    imshow("result", result);
-    imshow("Current", cFrame2);
+    // imshow("result", result);
+    // imshow("Current", cFrame2);
     imshow("Data", cData);
 
     gSystem->ProcessEvents();
