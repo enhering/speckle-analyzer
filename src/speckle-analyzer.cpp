@@ -148,13 +148,13 @@ int main(int argc, char* argv[]) {
 
     for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-        if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
-          cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
+        if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3f>(nY,nX)[0] ) {
+          cData.at<Vec3f>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
         }
-        if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
-          cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
+        if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3f>(nY,nX)[1]) {
+          cData.at<Vec3f>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
-        cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
+        cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; // amplitude
       }
       std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
                 << " min: " << cData.at<Vec3f>(nY,nX)[0] 
@@ -185,12 +185,12 @@ int main(int argc, char* argv[]) {
         }
         nPos = g_nNumPlotPoints - 1;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cData.at<Vec3s>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cData.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
       }
       else {
         nPos = g_nNumDataPoint;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cData.at<Vec3s>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cData.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
       }
       
       graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
@@ -214,9 +214,9 @@ int main(int argc, char* argv[]) {
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      cData.at<Vec3s>(nY,nX)[0] = 0; // min
-      cData.at<Vec3s>(nY,nX)[1] = 0; // max
-      // cData.at<Vec3s>(nY,nX)[2] = 0; // amplitude
+      cData.at<Vec3f>(nY,nX)[0] = 0; // min
+      cData.at<Vec3f>(nY,nX)[1] = 0; // max
+      // cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
     }
   }
 
