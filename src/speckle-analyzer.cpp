@@ -148,20 +148,18 @@ int main(int argc, char* argv[]) {
 
     for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-
-        std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
-                  << " min: " << cData.at<Vec3s>(nY,nX)[0] 
-                  << " max: " << cData.at<Vec3s>(nY,nX)[1]
-                  << " amplitude: " << cData.at<Vec3s>(nY,nX)[2] << std::endl; 
-
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3s>(nY,nX)[0] ) {
-          cData.at<Vec3s>(nY,nX)[0] = (unsigned short) cFrame2.at<ushort>(nY,nX); // min
+          cData.at<Vec3s>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
         }
         if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3s>(nY,nX)[1]) {
-          cData.at<Vec3s>(nY,nX)[1] = (unsigned short) cFrame2.at<ushort>(nY,nX); // max
+          cData.at<Vec3s>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
         cData.at<Vec3s>(nY,nX)[2] = cData.at<Vec3s>(nY,nX)[1] - cData.at<Vec3s>(nY,nX)[0]; // amplitude
       }
+      std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
+                << " min: " << cData.at<Vec3f>(nY,nX)[0] 
+                << " max: " << cData.at<Vec3f>(nY,nX)[1]
+                << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl; 
     }
 
     
