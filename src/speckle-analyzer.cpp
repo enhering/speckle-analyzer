@@ -156,10 +156,10 @@ int main(int argc, char* argv[]) {
         }
         cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; // amplitude
         
-        std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
-                << " min: " << cData.at<Vec3f>(nY,nX)[0] 
-                << " max: " << cData.at<Vec3f>(nY,nX)[1]
-                << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl; 
+        // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
+        //         << " min: " << cData.at<Vec3f>(nY,nX)[0] 
+        //         << " max: " << cData.at<Vec3f>(nY,nX)[1]
+        //         << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl; 
       }
       
     }
