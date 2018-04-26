@@ -30,6 +30,9 @@ bool g_bEraseAllData;
 int g_ImageHeight, g_ImageWidth;
 
 DC1394Wrapper g_cDC1394Wrapper;
+float g_nMaxIntensity = 0;
+
+Mat cData, cDataToPlot;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -78,17 +81,34 @@ cv::Mat CaptureImage() {
   return cFrame;
 }
 
+void InitDataMatrix() {
+  std::cout << "Initializing data matrix...";
+
+  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+  cDataToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+
+  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+      
+      cData.at<Vec3f>(nY,nX)[0] = 65000; // min
+      cData.at<Vec3f>(nY,nX)[1] = 0; // max
+      cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
+      // std::cout << "(" << nX << "," << nY << "): " << cData.at<Vec3f>(nY,nX)[0] << std::endl;
+    }
+  }
+  std::cout << "Done." << std::endl;
+}
+
 int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
   Mat cFrame1, cFrame2, result;
-  Mat cData;
 
   bool bFirstRun = true;
   
   TApplication  app("app", &argc, argv);
-  TCanvas       canvas("a", "b", 500, 700, 400, 200);
+  TCanvas       canvas("a", "b", 800, 700, 400, 200);
   TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
 
   graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
@@ -109,20 +129,9 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
-  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);  
+ 
+  InitDataMatrix();
 
-  std::cout << "Initializing data matrix...";
-
-  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      
-      cData.at<Vec3f>(nY,nX)[0] = 65000; // min
-      cData.at<Vec3f>(nY,nX)[1] = 0; // max
-      cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
-      // std::cout << "(" << nX << "," << nY << "): " << cData.at<Vec3f>(nY,nX)[0] << std::endl;
-    }
-  }
-  std::cout << "Done." << std::endl;
   namedWindow("result",1);
   namedWindow("Current",1);
   namedWindow("Data",1);
@@ -134,11 +143,11 @@ int main(int argc, char* argv[]) {
   qualityType.push_back(90);
 
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
+  cFrame1 = CaptureImage().clone();
+  g_cDC1394Wrapper.ReleaseFrame(); 
 
   while(1) {
-    cFrame1 = CaptureImage().clone();
-    g_cDC1394Wrapper.ReleaseFrame(); 
-
+    
     cFrame2 = CaptureImage().clone();
     g_cDC1394Wrapper.ReleaseFrame();
 
@@ -154,7 +163,10 @@ int main(int argc, char* argv[]) {
         if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3f>(nY,nX)[1]) {
           cData.at<Vec3f>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
-        cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; // amplitude
+        if (cFrame2.at<ushort>(nY,nX) > g_nMaxIntensity) {
+          g_nMaxIntensity = cFrame2.at<ushort>(nY,nX);
+        }
+        cData.at<Vec3f>(nY,nX)[2] = (cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]); // amplitude
 
         // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
         //         << " min: " << cData.at<Vec3f>(nY,nX)[0] 
@@ -187,12 +199,12 @@ int main(int argc, char* argv[]) {
         }
         nPos = g_nNumPlotPoints - 1;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cFrame2.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
       }
       else {
         nPos = g_nNumDataPoint;
         g_fXData[nPos] = g_nNumDataPoint;
-        g_fYData[nPos] = (unsigned short) cFrame2.at<Vec3f>(g_nMouseY, g_nMouseX)[1];
+        g_fYData[nPos] = (unsigned short) cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
       }
       
       graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
@@ -202,9 +214,30 @@ int main(int argc, char* argv[]) {
     graph.Draw("APL");
     canvas.Update();
 
-    // imshow("result", result);
-    // imshow("Current", cFrame2);
-    imshow("Data", cData);
+    int nRegenerationStep = 1000;
+
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+        cDataToPlot.at<Vec3f>(nY,nX)[0] = 0;//cData.at<Vec3f>(nY,nX)[0] / g_nMaxIntensity; // min
+        cDataToPlot.at<Vec3f>(nY,nX)[1] = 0;//cData.at<Vec3f>(nY,nX)[1] / g_nMaxIntensity; // max
+        cDataToPlot.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[2] / g_nMaxIntensity; // amplitude
+      
+        // Bring data down to min
+        if (cData.at<Vec3f>(nY,nX)[0] > nRegenerationStep) {
+          cData.at<Vec3f>(nY,nX)[0] -= nRegenerationStep;
+        }
+
+        // Take data up to max
+        if (cData.at<Vec3f>(nY,nX)[1] < (65535 - nRegenerationStep)) {
+          cData.at<Vec3f>(nY,nX)[0] += nRegenerationStep;
+        }
+        cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; 
+      }
+    }
+
+    imshow("result", result);
+    imshow("Current", cFrame2);
+    imshow("Data", cDataToPlot);
 
     gSystem->ProcessEvents();
 
@@ -212,14 +245,10 @@ int main(int argc, char* argv[]) {
     //if (g_nNumDataPoint > 100) break;
 
     if (waitKey(30) >= 0) break;
-  }
 
-  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      cData.at<Vec3f>(nY,nX)[0] = 0; // min
-      cData.at<Vec3f>(nY,nX)[1] = 0; // max
-      // cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
-    }
+    // if (g_nNumDataPoint % 10 == 0) {
+    //   InitDataMatrix();
+    // }
   }
 
   // cv::imwrite("Data.jpg", cData, qualityType);

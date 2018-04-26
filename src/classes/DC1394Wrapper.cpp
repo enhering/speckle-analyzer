@@ -125,9 +125,9 @@ int DC1394Wrapper::Init() {
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_WHITE_SHADING, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_FRAME_RATE, 0);
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_ZOOM, 0);
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 319);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_PAN, 300);
   std::cout << "-";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 66);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_TILT, 150);
   std::cout << "/";
   // m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_OPTICAL_FILTER, 0);
   std::cout << "|";
