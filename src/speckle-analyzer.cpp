@@ -223,13 +223,13 @@ int main(int argc, char* argv[]) {
         cDataToPlot.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[2] / g_nMaxIntensity; // amplitude
       
         // Bring data down to min
-        if (cData.at<Vec3f>(nY,nX)[0] > nRegenerationStep) {
-          cData.at<Vec3f>(nY,nX)[0] -= nRegenerationStep;
+        if (cData.at<Vec3f>(nY,nX)[0] < (65535 - nRegenerationStep)) {
+          cData.at<Vec3f>(nY,nX)[0] += nRegenerationStep;
         }
 
         // Take data up to max
-        if (cData.at<Vec3f>(nY,nX)[1] < (65535 - nRegenerationStep)) {
-          cData.at<Vec3f>(nY,nX)[0] += nRegenerationStep;
+        if (cData.at<Vec3f>(nY,nX)[1] > nRegenerationStep ) {
+          cData.at<Vec3f>(nY,nX)[0] -= nRegenerationStep;
         }
         cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; 
       }
