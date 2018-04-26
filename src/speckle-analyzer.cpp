@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
-  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16FC3);  
+  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);  
 
   std::cout << "Initializing data matrix...";
 
