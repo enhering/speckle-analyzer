@@ -17,6 +17,8 @@
 
 using namespace cv;
 
+std::string strSampleName = "Sample";
+
 int g_nMouseX, g_nMouseY;
 
 int g_nNumBytesPerPixel = 2;
@@ -146,6 +148,8 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame(); 
 
+  long nNumFrame = 0;
+
   while(1) {
     
     cFrame2 = CaptureImage().clone();
@@ -229,15 +233,18 @@ int main(int argc, char* argv[]) {
 
         // Take data up to max
         if (cData.at<Vec3f>(nY,nX)[1] > nRegenerationStep ) {
-          cData.at<Vec3f>(nY,nX)[0] -= nRegenerationStep;
+          cData.at<Vec3f>(nY,nX)[1] -= nRegenerationStep;
         }
-        cData.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]; 
+        cData.at<Vec3f>(nY,nX)[2] = 65535- (cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]); 
       }
     }
 
     imshow("result", result);
     imshow("Current", cFrame2);
     imshow("Data", cDataToPlot);
+
+    std::string strFileName = "data/Amostra-" + std::to_string(nNumFrame) + ".tiff";
+    imwrite(strFileName, cFrame2);
 
     gSystem->ProcessEvents();
 
@@ -249,6 +256,10 @@ int main(int argc, char* argv[]) {
     // if (g_nNumDataPoint % 10 == 0) {
     //   InitDataMatrix();
     // }
+    nNumFrame++;
+    if (nNumFrame > 500) {
+      break;
+    }
   }
 
   // cv::imwrite("Data.jpg", cData, qualityType);
