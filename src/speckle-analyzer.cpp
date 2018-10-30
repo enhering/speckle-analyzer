@@ -17,7 +17,7 @@
 
 using namespace cv;
 
-std::string strSampleName = "Sample";
+std::string strSampleName = "quiabo02";
 
 int g_nMouseX, g_nMouseY;
 
@@ -34,7 +34,7 @@ int g_ImageHeight, g_ImageWidth;
 DC1394Wrapper g_cDC1394Wrapper;
 float g_nMaxIntensity = 0;
 
-Mat cData, cDataToPlot;
+Mat cData, cDataToPlot, cData2, cData2ToPlot;
 
 void ZeroDataPoints() {
   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
@@ -88,6 +88,8 @@ void InitDataMatrix() {
 
   cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
   cDataToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+  cData2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+  cData2ToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
 
   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
@@ -105,7 +107,7 @@ int main(int argc, char* argv[]) {
 
   g_bEraseAllData = false;
   g_nNumDataPoint = 0;
-  Mat cFrame1, cFrame2, result;
+  Mat cFrame1, cFrame2, result, cLastFrame;
 
   bool bFirstRun = true;
   
@@ -137,6 +139,7 @@ int main(int argc, char* argv[]) {
   namedWindow("result",1);
   namedWindow("Current",1);
   namedWindow("Data",1);
+  namedWindow("InertiaMoment",1);
 
   setMouseCallback("Current", onMouse);
 
@@ -148,7 +151,9 @@ int main(int argc, char* argv[]) {
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame(); 
 
-  long nNumFrame = 0;
+  long nNumFrame = 1;
+
+  cLastFrame = cFrame1.clone();
 
   while(1) {
     
@@ -159,6 +164,22 @@ int main(int argc, char* argv[]) {
 
     subtract(cFrame1, cFrame2, result);
 
+    double fMaxDiffSqr = 0;
+
+    g_nMaxIntensity = 0;
+    // find max intensity
+    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+        if (cFrame2.at<ushort>(nY,nX) > g_nMaxIntensity) {
+          g_nMaxIntensity = cFrame2.at<ushort>(nY,nX);
+        }
+        if (cData2.at<Vec3f>(nY,nX)[1] > fMaxDiffSqr) {
+          fMaxDiffSqr = cData2.at<Vec3f>(nY,nX)[1];
+        }
+      }
+    }
+
+
     for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3f>(nY,nX)[0] ) {
@@ -167,19 +188,31 @@ int main(int argc, char* argv[]) {
         if (cFrame2.at<ushort>(nY,nX) > cData.at<Vec3f>(nY,nX)[1]) {
           cData.at<Vec3f>(nY,nX)[1] = cFrame2.at<ushort>(nY,nX); // max
         }
-        if (cFrame2.at<ushort>(nY,nX) > g_nMaxIntensity) {
-          g_nMaxIntensity = cFrame2.at<ushort>(nY,nX);
-        }
         cData.at<Vec3f>(nY,nX)[2] = (cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]); // amplitude
+
+        // Calculate intensity difference between this frama and last frame
+        double fDifference = (cFrame2.at<ushort>(nY,nX) - cLastFrame.at<ushort>(nY, nX));
+
+        // Save square of difference
+        double fSquareofDifference = pow(fDifference, 2);
+
+        // Average the squares of differences
+        cData2.at<Vec3f>(nY,nX)[1] = ((cData2.at<Vec3f>(nY,nX)[0] * (nNumFrame-1)) + fSquareofDifference) / nNumFrame;
+
+        // Save this average
+        cData2.at<Vec3f>(nY,nX)[0] = cData2.at<Vec3f>(nY,nX)[1];
+
+        // Save intensity value for next frame
+        cData2.at<Vec3f>(nY,nX)[2] = cFrame2.at<ushort>(nY,nX) / g_nMaxIntensity;
 
         // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
         //         << " min: " << cData.at<Vec3f>(nY,nX)[0] 
         //         << " max: " << cData.at<Vec3f>(nY,nX)[1]
         //         << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl; 
-      }
-      
+      }  
     }
 
+    cLastFrame = cFrame2.clone();
     
     //ushort intensity = cFrame2.at<ushort>(200, 200);
 
@@ -220,11 +253,17 @@ int main(int argc, char* argv[]) {
 
     int nRegenerationStep = 1000;
 
+    cData2ToPlot = cData2;
+
     for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
       for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-        cDataToPlot.at<Vec3f>(nY,nX)[0] = 0;//cData.at<Vec3f>(nY,nX)[0] / g_nMaxIntensity; // min
+        cDataToPlot.at<Vec3f>(nY,nX)[0] = cData2.at<Vec3f>(nY,nX)[2];//cData.at<Vec3f>(nY,nX)[0] / g_nMaxIntensity; // min
         cDataToPlot.at<Vec3f>(nY,nX)[1] = 0;//cData.at<Vec3f>(nY,nX)[1] / g_nMaxIntensity; // max
         cDataToPlot.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[2] / g_nMaxIntensity; // amplitude
+
+        // cData2ToPlot.at<Vec3f>(nY,nX)[0] /= fMaxDiffSqr;
+        cData2ToPlot.at<Vec3f>(nY,nX)[1] = 0;
+        // cData2ToPlot.at<Vec3f>(nY,nX)[2] /= 5;
       
         // Bring data down to min
         if (cData.at<Vec3f>(nY,nX)[0] < (65535 - nRegenerationStep)) {
@@ -239,12 +278,20 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    // add(cDataToPlot, cFrame2, cDataToPlot);
+
     imshow("result", result);
     imshow("Current", cFrame2);
     imshow("Data", cDataToPlot);
+    imshow("InertiaMoment", cData2ToPlot);
 
-    std::string strFileName = "data/Amostra-" + std::to_string(nNumFrame) + ".tiff";
-    imwrite(strFileName, cFrame2);
+    std::string strFileName = std::to_string(nNumFrame) + ".png";
+
+    imwrite("data/" + strSampleName + "/" + strFileName, cFrame2);
+    imwrite("data/activity/" + strSampleName + "/" + strFileName, cData2ToPlot);
+    // imwrite(strFileName+"dif.tiff", result);
+    imwrite("data/amplitudes/"+ strSampleName + "/" + strFileName, cDataToPlot);
+
 
     gSystem->ProcessEvents();
 
@@ -256,10 +303,14 @@ int main(int argc, char* argv[]) {
     // if (g_nNumDataPoint % 10 == 0) {
     //   InitDataMatrix();
     // }
+    
     nNumFrame++;
-    if (nNumFrame > 500) {
-      break;
-    }
+
+    // if (nNumFrame > 400) {
+    //   break;
+    // }
+
+    sleep(20);
   }
 
   // cv::imwrite("Data.jpg", cData, qualityType);

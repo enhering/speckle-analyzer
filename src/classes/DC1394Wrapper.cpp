@@ -80,12 +80,12 @@ int DC1394Wrapper::Init() {
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting video mode... ";
-  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_640x480_MONO16);
+  m_eErr=dc1394_video_set_mode(m_pcCamera, DC1394_VIDEO_MODE_1280x960_MONO16);
   CheckError(3);
   std::cout << "Done." << std::endl;
 
   std::cout << "Setting frame rate... ";
-  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_15);
+  m_eErr=dc1394_video_set_framerate(m_pcCamera, DC1394_FRAMERATE_7_5);
   CheckError(4);
   std::cout << "Done." << std::endl;
 
@@ -113,7 +113,7 @@ int DC1394Wrapper::Init() {
   std::cout << "-";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAMMA, 0);
   std::cout << "/";
-  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 155);
+  m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_SHUTTER, 255);
   std::cout << "|";
   m_eErr = dc1394_feature_set_value(m_pcCamera, DC1394_FEATURE_GAIN, 0);
   std::cout << "\\";

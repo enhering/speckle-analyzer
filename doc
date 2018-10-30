@@ -1,0 +1,4 @@
+rename -e 's/\d+/sprintf("%05d", $&)/e' -- *.png
+
+ffmpeg -framerate 1/5 -i %05d.png -c:v libx264 -r 30 -pix_fmt yuv420p outdata.mp4
+ffmpeg -framerate 50 -i %05d.png -c:v libx264  -pix_fmt yuv420p outdata.mp4 
