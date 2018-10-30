@@ -2,7 +2,7 @@
 
 
 DC1394Wrapper::DC1394Wrapper() {
-/*  
+/*
 #ifdef CAM_IFACE_CALL_UNLISTEN
 #include <dc1394/kernel-video1394.h> // for VIDEO1394_IOC_UNLISTEN_CHANNEL
 #endif
@@ -58,7 +58,7 @@ int DC1394Wrapper::Init() {
   // CheckError(20);
   // std::cout << "Done." << std::endl;
 
-  // 
+  //
   // std::cout << "Powering down camera... ";
   // m_eErr =  dc1394_camera_set_power(m_pcCamera, DC1394_OFF);
   // CheckError(11);
@@ -168,7 +168,7 @@ void DC1394Wrapper::Grab() {
     m_eErr=dc1394_capture_dequeue(m_pcCamera, DC1394_CAPTURE_POLICY_WAIT, &m_pcFrame);
     CheckError(6);
     if (m_pcFrame == NULL) {
-      std::cout << "Empty buffer... Waiting 1msec. " << std::endl;  
+      std::cout << "Empty buffer... Waiting 1msec. " << std::endl;
       usleep(1000);
     }
     else {
@@ -180,10 +180,10 @@ void DC1394Wrapper::Grab() {
 }
 
 void DC1394Wrapper::AllocateRGBBuffer() {
-  FreeRGBBuffer();  
+  FreeRGBBuffer();
   uint32_t nBufferSize = m_pcFrame->image_bytes * 3;
   m_panRGBBuffer = (unsigned char *) malloc(nBufferSize);
-  m_bRGBBufferAllocated = true;  
+  m_bRGBBufferAllocated = true;
 }
 
 unsigned char * DC1394Wrapper::GetRawImage() {
@@ -201,7 +201,7 @@ unsigned char * DC1394Wrapper::GetRGBImage() {
 
   uint32_t nBufferSize = m_pcFrame->image_bytes * 3;
 
-  m_eErr = dc1394_bayer_decoding_16bit((uint16_t * ) m_pcFrame->image, 
+  m_eErr = dc1394_bayer_decoding_16bit((uint16_t * ) m_pcFrame->image,
                                        (uint16_t * ) m_panRGBBuffer,
                                        m_pcFrame->size[0],
                                        m_pcFrame->size[1],
@@ -254,3 +254,33 @@ void DC1394Wrapper::CheckError(int nStep) {
     exit(1);
   }
 }
+
+// cv::Mat CaptureImage() {
+//   g_cDC1394Wrapper.Grab();
+
+//   g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
+//   g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+
+//   // std::cout << "Frame1  data: width="
+//   //           << g_ImageWidth
+//   //           << " height="
+//   //           << g_ImageHeight
+//   //           << " size "
+//   //           << g_cDC1394Wrapper.GetImageSize()
+//   //           << "bytes." << std::endl;
+
+//   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRawImage();
+//   Mat cFrame;
+
+//   if (pFrameAddress == NULL) {
+//     cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+//     return cFrame;
+//   }
+//   else {
+//     cFrame.create(Size(g_ImageWidth,
+//                        g_ImageHeight),
+//                        CV_16UC1);
+//     cFrame.data = pFrameAddress;
+//   }
+//   return cFrame;
+// }

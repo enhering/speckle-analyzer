@@ -2,32 +2,35 @@
 
 #include "opencv2/opencv.hpp"
 
-#include "TCanvas.h"
-#include "TROOT.h"
-#include "TGraph.h"
-#include "TF1.h"
-#include "TLegend.h"
-#include "TArrow.h"
-#include "TLatex.h"
-#include "TSystem.h"
-#include "TApplication.h"
-#include "TAxis.h"
+// #include "TCanvas.h"
+// #include "TROOT.h"
+// #include "TGraph.h"
+// #include "TF1.h"
+// #include "TLegend.h"
+// #include "TArrow.h"
+// #include "TLatex.h"
+// #include "TSystem.h"
+// #include "TApplication.h"
+// #include "TAxis.h"
 
 #include "DC1394Wrapper.h"
+#include "Graph.h"
+#include "Analysis.h"
+#include "Sample.h"
 
 using namespace cv;
 
-std::string strSampleName = "quiabo02";
+// std::string strSampleName = "quiabo02";
 
 int g_nMouseX, g_nMouseY;
 
 int g_nNumBytesPerPixel = 2;
 
-const int g_nNumPlotPoints = 1000;
-double g_fXData[g_nNumPlotPoints];
-double g_fYData[g_nNumPlotPoints];
-int g_nNumDataPoint;
-bool g_bEraseAllData;
+// const int g_nNumPlotPoints = 1000;
+// double g_fXData[g_nNumPlotPoints];
+// double g_fYData[g_nNumPlotPoints];
+// int g_nNumDataPoint;
+// bool g_bEraseAllData;
 
 int g_ImageHeight, g_ImageWidth;
 
@@ -36,12 +39,12 @@ float g_nMaxIntensity = 0;
 
 Mat cData, cDataToPlot, cData2, cData2ToPlot;
 
-void ZeroDataPoints() {
-  for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
-    g_fXData[nI] = nI;
-    g_fYData[nI] = 0.0;
-  }
-}
+// void ZeroDataPoints() {
+//   for (int nI = 0; nI < g_nNumPlotPoints; nI++) {
+//     g_fXData[nI] = nI;
+//     g_fYData[nI] = 0.0;
+//   }
+// }
 
 static void onMouse(int event,int x,int y,int,void*) {
   //this function will be called every time you move your mouse over the image
@@ -53,55 +56,55 @@ static void onMouse(int event,int x,int y,int,void*) {
   g_bEraseAllData = true;
 }
 
-cv::Mat CaptureImage() {
-  g_cDC1394Wrapper.Grab();
+// cv::Mat CaptureImage() {
+//   g_cDC1394Wrapper.Grab();
 
-  g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
-  g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+//   g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
+//   g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
 
-  // std::cout << "Frame1  data: width=" 
-  //           << g_ImageWidth 
-  //           << " height=" 
-  //           << g_ImageHeight 
-  //           << " size " 
-  //           << g_cDC1394Wrapper.GetImageSize()
-  //           << "bytes." << std::endl;
+//   // std::cout << "Frame1  data: width="
+//   //           << g_ImageWidth
+//   //           << " height="
+//   //           << g_ImageHeight
+//   //           << " size "
+//   //           << g_cDC1394Wrapper.GetImageSize()
+//   //           << "bytes." << std::endl;
 
-  uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRawImage();
-  Mat cFrame;
+//   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRawImage();
+//   Mat cFrame;
 
-  if (pFrameAddress == NULL) {
-    cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);  
-    return cFrame;
-  }
-  else {
-    cFrame.create(Size(g_ImageWidth, 
-                       g_ImageHeight), 
-                       CV_16UC1);
-    cFrame.data = pFrameAddress;
-  }
-  return cFrame;
-}
+//   if (pFrameAddress == NULL) {
+//     cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+//     return cFrame;
+//   }
+//   else {
+//     cFrame.create(Size(g_ImageWidth,
+//                        g_ImageHeight),
+//                        CV_16UC1);
+//     cFrame.data = pFrameAddress;
+//   }
+//   return cFrame;
+// }
 
-void InitDataMatrix() {
-  std::cout << "Initializing data matrix...";
+// void InitDataMatrix() {
+//   std::cout << "Initializing data matrix...";
 
-  cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
-  cDataToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
-  cData2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
-  cData2ToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+//   cData = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+//   cDataToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+//   cData2 = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
+//   cData2ToPlot = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_32FC3);
 
-  for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-    for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-      
-      cData.at<Vec3f>(nY,nX)[0] = 65000; // min
-      cData.at<Vec3f>(nY,nX)[1] = 0; // max
-      cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
-      // std::cout << "(" << nX << "," << nY << "): " << cData.at<Vec3f>(nY,nX)[0] << std::endl;
-    }
-  }
-  std::cout << "Done." << std::endl;
-}
+//   for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
+//     for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+
+//       cData.at<Vec3f>(nY,nX)[0] = 65000; // min
+//       cData.at<Vec3f>(nY,nX)[1] = 0; // max
+//       cData.at<Vec3f>(nY,nX)[2] = 0; // amplitude
+//       // std::cout << "(" << nX << "," << nY << "): " << cData.at<Vec3f>(nY,nX)[0] << std::endl;
+//     }
+//   }
+//   std::cout << "Done." << std::endl;
+// }
 
 int main(int argc, char* argv[]) {
 
@@ -110,30 +113,30 @@ int main(int argc, char* argv[]) {
   Mat cFrame1, cFrame2, result, cLastFrame;
 
   bool bFirstRun = true;
-  
+
   TApplication  app("app", &argc, argv);
-  TCanvas       canvas("a", "b", 800, 700, 400, 200);
-  TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
+  // TCanvas       canvas("a", "b", 800, 700, 400, 200);
+  // TGraph        graph(g_nNumPlotPoints, g_fXData, g_fYData);
 
-  graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
-  
-  graph.SetMarkerStyle(2);
-  graph.SetMarkerColor(4);
-  graph.SetMarkerSize(0.3);
+  // graph.SetTitle("Speckle intensity; pixel intensity [0..255]; num data point");
 
-  graph.SetLineColor(4);
-  graph.SetLineWidth(1);
+  // graph.SetMarkerStyle(2);
+  // graph.SetMarkerColor(4);
+  // graph.SetMarkerSize(0.3);
 
-  graph.GetXaxis()->SetNdivisions(5, kTRUE);
+  // graph.SetLineColor(4);
+  // graph.SetLineWidth(1);
 
-  graph.Draw("APL");
+  // graph.GetXaxis()->SetNdivisions(5, kTRUE);
+
+  // graph.Draw("APL");
 
   g_cDC1394Wrapper.Init();
-  
+
   cFrame1 = CaptureImage().clone();
   g_cDC1394Wrapper.ReleaseFrame();
 
- 
+
   InitDataMatrix();
 
   namedWindow("result",1);
@@ -149,14 +152,14 @@ int main(int argc, char* argv[]) {
 
   // cv::imwrite("Frame1.jpg", cFrame1, qualityType);
   cFrame1 = CaptureImage().clone();
-  g_cDC1394Wrapper.ReleaseFrame(); 
+  g_cDC1394Wrapper.ReleaseFrame();
 
   long nNumFrame = 1;
 
   cLastFrame = cFrame1.clone();
 
   while(1) {
-    
+
     cFrame2 = CaptureImage().clone();
     g_cDC1394Wrapper.ReleaseFrame();
 
@@ -205,15 +208,15 @@ int main(int argc, char* argv[]) {
         // Save intensity value for next frame
         cData2.at<Vec3f>(nY,nX)[2] = cFrame2.at<ushort>(nY,nX) / g_nMaxIntensity;
 
-        // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX) 
-        //         << " min: " << cData.at<Vec3f>(nY,nX)[0] 
+        // std::cout << "frame data at (" << nX << ", " << nY << "): " << cFrame2.at<ushort>(nY,nX)
+        //         << " min: " << cData.at<Vec3f>(nY,nX)[0]
         //         << " max: " << cData.at<Vec3f>(nY,nX)[1]
-        //         << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl; 
-      }  
+        //         << " amplitude: " << cData.at<Vec3f>(nY,nX)[2] << std::endl;
+      }
     }
 
     cLastFrame = cFrame2.clone();
-    
+
     //ushort intensity = cFrame2.at<ushort>(200, 200);
 
     // std::cout << "x: "  << g_nMouseX << " y: " << g_nMouseY << " Intensity:" << intensity << std::endl;
@@ -243,7 +246,7 @@ int main(int argc, char* argv[]) {
         g_fXData[nPos] = g_nNumDataPoint;
         g_fYData[nPos] = (unsigned short) cFrame2.at<ushort>(g_nMouseY, g_nMouseX);
       }
-      
+
       graph.SetPoint(nPos, g_fXData[nPos], g_fYData[nPos]);
       g_nNumDataPoint++;
     }
@@ -264,7 +267,7 @@ int main(int argc, char* argv[]) {
         // cData2ToPlot.at<Vec3f>(nY,nX)[0] /= fMaxDiffSqr;
         cData2ToPlot.at<Vec3f>(nY,nX)[1] = 0;
         // cData2ToPlot.at<Vec3f>(nY,nX)[2] /= 5;
-      
+
         // Bring data down to min
         if (cData.at<Vec3f>(nY,nX)[0] < (65535 - nRegenerationStep)) {
           cData.at<Vec3f>(nY,nX)[0] += nRegenerationStep;
@@ -274,7 +277,7 @@ int main(int argc, char* argv[]) {
         if (cData.at<Vec3f>(nY,nX)[1] > nRegenerationStep ) {
           cData.at<Vec3f>(nY,nX)[1] -= nRegenerationStep;
         }
-        cData.at<Vec3f>(nY,nX)[2] = 65535- (cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]); 
+        cData.at<Vec3f>(nY,nX)[2] = 65535- (cData.at<Vec3f>(nY,nX)[1] - cData.at<Vec3f>(nY,nX)[0]);
       }
     }
 
@@ -303,7 +306,7 @@ int main(int argc, char* argv[]) {
     // if (g_nNumDataPoint % 10 == 0) {
     //   InitDataMatrix();
     // }
-    
+
     nNumFrame++;
 
     // if (nNumFrame > 400) {

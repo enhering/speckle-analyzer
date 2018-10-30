@@ -121,10 +121,7 @@ SOURCE_DIR = src
 CLASSES_DIR = $(SOURCE_DIR)/classes
 
 SRC_FILES=$(CLASSES_SRC_DIR)/DC1394Wrapper.cpp    \
-          $(CLASSES_SRC_DIR)/Base.cpp             \
-          $(CLASSES_SRC_DIR)/Graph.cpp            \
-          $(CLASSES_SRC_DIR)/Analysis.cpp         \
-          $(CLASSES_SRC_DIR)/Sample.cpp
+          $(CLASSES_SRC_DIR)/Base.cpp
 
 CXX = $(COMPILER)
 CC = $(CXX)
@@ -135,7 +132,7 @@ EXTRA_CCFLAGS   = -Wall -w --std=c++11
 CXXFLAGS        = $(DEBUG_LEVEL) $(EXTRA_CCFLAGS)
 CCFLAGS         = $(CXXFLAGS)
 
-CPPFLAGS        = -I$(SOURCE_DIR) -I$(CLASSES_DIR) $(IXML) $(IROOT) $(LOPENCV)  $(LROOT) -ldc1394
+CPPFLAGS        = -I$(SOURCE_DIR) -I$(CLASSES_DIR) $(IXML) $(LOPENCV)  $(LROOT) -ldc1394
 
 LDFLAGS         = -L$(SOURCE_DIR)
 
@@ -148,7 +145,7 @@ COMPILE = $(CXX) $(CXXFLAGS) $(CPPFLAGS)
 OUTPUT_OPTION = -o $@
 
 
-all: $(BINDIR)/speckle-analyzer
+all: $(BINDIR)/speckle-analyzer $(CLASSES_DIR)/BuildNumber.h
 
 $(BINDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp $(O_FILES)
 	@/bin/echo -n Compiling $@...
@@ -160,11 +157,11 @@ $(BINDIR)/speckle-analyzer: $(EXEC_SRC_DIR)/speckle-analyzer.cpp $(O_FILES)
 	@$(COMPILE) -c $< $(OUTPUT_OPTION)
 	@echo Ok.
 
-# $(CLASSES_DIR)/BuildNumber.h: $(shell find src -type f)
-# 	@/bin/echo -n Generating new build number...
-# 	@cat build.number
-# 	@sh make_buildnum.sh
-# 	@echo Ok.
+$(CLASSES_DIR)/BuildNumber.h: $(shell find src -type f)
+	@/bin/echo -n Generating new build number...
+	@cat build.number
+	@sh make_buildnum.sh
+	@echo Ok.
 
 depend:
 	makedepend -- $(CPPFLAGS) -- -Y $(SRC_FILES)
