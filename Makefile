@@ -122,9 +122,8 @@ CLASSES_DIR = $(SOURCE_DIR)/classes
 
 SRC_FILES=$(CLASSES_SRC_DIR)/DC1394Wrapper.cpp    \
           $(CLASSES_SRC_DIR)/Base.cpp             \
-          $(CLASSES_SRC_DIR)/Graph.cpp            \
-          $(CLASSES_SRC_DIR)/Analysis.cpp         \
-          $(CLASSES_SRC_DIR)/Sample.cpp
+          $(CLASSES_SRC_DIR)/Speckle.cpp          \
+
 
 CXX = $(COMPILER)
 CC = $(CXX)

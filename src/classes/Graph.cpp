@@ -18,6 +18,13 @@ Graph::Graph() {
   graph.GetXaxis()->SetNdivisions(5, kTRUE);
 
   graph.Draw("APL");
+
+  // const int g_nNumPlotPoints = 1000;
+// double g_fXData[g_nNumPlotPoints];
+// double g_fYData[g_nNumPlotPoints];
+// int g_nNumDataPoint;
+// bool g_bEraseAllData;
+
 }
 
 Graph::~Graph() {
@@ -29,4 +36,10 @@ void Graph::ZeroDataPoints() {
     g_fXData[nI] = nI;
     g_fYData[nI] = 0.0;
   }
+}
+
+void Graph::AddDatapoint(double fX, double fY) {
+      // g_nNumDataPoint++;
+    //if (g_nNumDataPoint > 100) break;
+
 }
