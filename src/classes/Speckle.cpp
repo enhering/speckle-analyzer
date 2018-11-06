@@ -2,39 +2,57 @@
 
 Speckle::Speckle() {
   m_nMaxIntensity = 0;
+  m_MinIntensity  = 1E9;
 }
 
 Speckle::~Speckle() {
 
 }
 
+void SetImage(cv::Mat Image) {
+  m_LastInputImage = m_InputImage;
+  m_InputImage = Image;
+
+  m_nImageRows = Image.rows;
+  m_nImageCols = Image.cols;
+}
+
+cv::Mat Speckle::GetImageDifference() {
+  cv::Mat Difference;
+
+  subtract(m_LastInputImage, m_InputImage, Difference);
+
+  return Difference;
+}
+
+void Speckle::FindIntensityExtremes() {
+  m_nMaxIntensity = 0;
+  m_MinIntensity  = 1E9;
+
+  for (uint16_t nX = 0; nX < m_nImageCols; nX++) {
+    for (uint16_t nY = 0; nY < m_nImageRows; nY++) {
+      if (m_InputImage.at<ushort>(nY,nX) > m_nMaxIntensity) {
+        m_nMaxIntensity = m_InputImage.at<ushort>(nY,nX);
+      }
+      if (m_InputImage.at<ushort>(nY,nX) < m_nMinIntensity) {
+        m_nMinIntensity = m_InputImage.at<ushort>(nY,nX);
+      }
+      // if (cData2.at<Vec3f>(nY,nX)[1] > fMaxDiffSqr) {
+      //   fMaxDiffSqr = cData2.at<Vec3f>(nY,nX)[1];
+      // }
+    }
+  }
+
+}
+
 void Speckle::CalcActivity() {
-
-   cFrame2 = CaptureImage().clone();
-    g_pDC1394Wrapper.ReleaseFrame();
-
-    // cv::imwrite("Frame2.jpg", cFrame1, qualityType);
-
-    subtract(cFrame1, cFrame2, result);
 
     double fMaxDiffSqr = 0;
 
-    g_nMaxIntensity = 0;
-    // find max intensity
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
-        if (cFrame2.at<ushort>(nY,nX) > g_nMaxIntensity) {
-          g_nMaxIntensity = cFrame2.at<ushort>(nY,nX);
-        }
-        if (cData2.at<Vec3f>(nY,nX)[1] > fMaxDiffSqr) {
-          fMaxDiffSqr = cData2.at<Vec3f>(nY,nX)[1];
-        }
-      }
-    }
 
 
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+    for (uint16_t nX = 0; nX < m_nImageCols; nX++) {
+      for (uint16_t nY = 0; nY < m_nImageRows; nY++) {
         if (cFrame2.at<ushort>(nY,nX) < cData.at<Vec3f>(nY,nX)[0] ) {
           cData.at<Vec3f>(nY,nX)[0] = cFrame2.at<ushort>(nY,nX); // min
         }
@@ -108,8 +126,8 @@ void Speckle::CalcActivity() {
 
     cData2ToPlot = cData2;
 
-    for (uint16_t nX = 0; nX < g_ImageWidth; nX++) {
-      for (uint16_t nY = 0; nY < g_ImageHeight; nY++) {
+    for (uint16_t nX = 0; nX < m_nImageCols; nX++) {
+      for (uint16_t nY = 0; nY < m_nImageRows; nY++) {
         cDataToPlot.at<Vec3f>(nY,nX)[0] = cData2.at<Vec3f>(nY,nX)[2];//cData.at<Vec3f>(nY,nX)[0] / g_nMaxIntensity; // min
         cDataToPlot.at<Vec3f>(nY,nX)[1] = 0;//cData.at<Vec3f>(nY,nX)[1] / g_nMaxIntensity; // max
         cDataToPlot.at<Vec3f>(nY,nX)[2] = cData.at<Vec3f>(nY,nX)[2] / g_nMaxIntensity; // amplitude

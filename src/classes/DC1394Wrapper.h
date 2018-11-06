@@ -16,9 +16,9 @@
       unsigned char * GetRGBImage();
       void ReleaseFrame();
       unsigned char * GetRawImage();
-      uint32_t GetImageWidth()  { return m_pcFrame->size[0]; }
-      uint32_t GetImageHeight() { return m_pcFrame->size[1]; }
-      uint32_t GetImageSize()   { return m_pcFrame->image_bytes; }
+      uint32_t GetImageWidth()  { return m_nWidth; }
+      uint32_t GetImageHeight() { return m_nHeight; }
+      uint32_t GetImageSize()   { return m_nSize; }
 
       void  CheckError(int);
 
@@ -32,7 +32,7 @@
     private:
       FILE                * m_pImageFile;
       dc1394camera_t      * m_pcCamera;
-      unsigned int          m_nWidth, m_nHeight;
+      unsigned int          m_nWidth, m_nHeight, m_nSize;
       dc1394video_frame_t * m_pcFrame;
       dc1394featureset_t    m_cFeatures;
       dc1394_t            * m_pcD;

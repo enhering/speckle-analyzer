@@ -2,12 +2,15 @@
 
 #include "opencv2/opencv.hpp"
 
+#include "TApplication.h"
+
 #include "DC1394Wrapper.h"
 #include "Speckle.h"
 
 int g_nMouseX, g_nMouseY;
 
-// int g_nNumBytesPerPixel = 2;
+DC1394Wrapper * g_pDC1394Wrapper;
+Speckle * g_pSpeckle;
 
 static void onMouse(int event,int x,int y,int,void*) {
   g_nMouseX = x;
@@ -18,15 +21,16 @@ static void onMouse(int event,int x,int y,int,void*) {
 
 int main(int argc, char* argv[]) {
 
-  DC1394Wrapper * g_pDC1394Wrapper = new DC1394Wrapper();
-  Speckle * g_pSpeckle = new Speckle();
+  g_pDC1394Wrapper = new DC1394Wrapper();
+  g_pSpeckle = new Speckle();
 
   TApplication  app("app", &argc, argv);
 
+  cv::Mat CapturedFrame, ProcessedFrame;
 
   g_pDC1394Wrapper->Init();
 
-  cv::Mat CapturedFrame = g_pDC1394Wrapper->CaptureImage().clone();
+  CapturedFrame = g_pDC1394Wrapper->CaptureImage().clone();
   g_pDC1394Wrapper->ReleaseFrame();
 
   g_pSpeckle->SetImage(CapturedFrame);
@@ -34,16 +38,43 @@ int main(int argc, char* argv[]) {
   namedWindow("Current",1);
   setMouseCallback("Current", onMouse);
 
-  long nNumFrame = 1;
-  bool bRepeat = true;
   char nImageSelect = 0;
 
-  while(bRepeat) {
+  bool bRepeat = true;
+  long nNumFrame = 1;
 
-    cv::Mat CapturedFrame = g_pDC1394Wrapper->CaptureImage().clone();
+  while(bRepeat) {
+    CapturedFrame = g_pDC1394Wrapper->CaptureImage().clone();
     g_pDC1394Wrapper->ReleaseFrame();
 
     g_pSpeckle->SetImage(CapturedFrame);
+    ProcessedFrame = g_pSpeckle->GetProcessedImage();
+
+    gSystem->ProcessEvents();
+
+    char PressedKey = waitkey(30);
+
+    switch (PressedKey) {
+      case -1: break; // Nothing pressed
+      case 67: nImageSelect = 0; break;
+      case 68: nImageSelect = 1; break;
+      default: bRepeat = false;
+    }
+
+    switch(nImageSelect) {
+      case 1:  imshow("Current", ProcessedFrame);
+      case 0:
+      default: imshow("Current", CapturedFrame);
+    }
+
+    nNumFrame++;
+  }
+
+  g_pDC1394Wrapper->Close();
+
+  return 0;
+}
+
 
     // add(cDataToPlot, cFrame2, cDataToPlot);
 
@@ -54,29 +85,6 @@ int main(int argc, char* argv[]) {
     // // imwrite(strFileName+"dif.tiff", result);
     // imwrite("data/amplitudes/"+ strSampleName + "/" + strFileName, cDataToPlot);
 
-    gSystem->ProcessEvents();
-
-    char PressedKey = waitkey(30);
-
-    switch (PressedKey) {
-      case -1: break; // Nothing pressed
-      case 67: nImageSelect = 0; break;
-      default: bRepeat = false;
-    }
-
-    switch(nImageSelect) {
-      case 0:
-      default: imshow("Current", CapturedFrame);
-    }
-
-    nNumFrame++;
-
     // if (nNumFrame > 400) {
     //   break;
     // }
-  }
-
-  g_pDC1394Wrapper->Close();
-
-  return 0;
-}

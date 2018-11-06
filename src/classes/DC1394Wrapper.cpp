@@ -12,6 +12,10 @@ DC1394Wrapper::DC1394Wrapper() {
   m_bTransmissionStarted = false;
   m_bRGBBufferAllocated = false;
   m_bCameraInitialized = false;
+
+  m_nWidth  = 0;
+  m_nHeight = 0;
+  m_nSize   = 0;
 }
 
 DC1394Wrapper::~DC1394Wrapper() {
@@ -173,6 +177,9 @@ void DC1394Wrapper::Grab() {
     }
     else {
       bCaptureOK = true;
+      m_nWidth  = m_pcFrame->size[0];
+      m_nHeight = m_pcFrame->size[1];
+      m_nSize   = m_pcFrame->image_bytes;
       break;
     }
   }
@@ -255,32 +262,25 @@ void DC1394Wrapper::CheckError(int nStep) {
   }
 }
 
-// cv::Mat CaptureImage() {
-//   g_cDC1394Wrapper.Grab();
+cv::Mat DC1394Wrapper::CaptureImage() {
 
-//   g_ImageHeight = g_cDC1394Wrapper.GetImageHeight();
-//   g_ImageWidth  = g_cDC1394Wrapper.GetImageWidth();
+  Mat Image;
 
-//   // std::cout << "Frame1  data: width="
-//   //           << g_ImageWidth
-//   //           << " height="
-//   //           << g_ImageHeight
-//   //           << " size "
-//   //           << g_cDC1394Wrapper.GetImageSize()
-//   //           << "bytes." << std::endl;
+  Grab();
 
-//   uint8_t * pFrameAddress = g_cDC1394Wrapper.GetRawImage();
-//   Mat cFrame;
+  // std::cout << "Frame1  data: width=" << m_nWidth << " height=" << m_nHeight << " size " << m_nSize << "bytes." << std::endl;
 
-//   if (pFrameAddress == NULL) {
-//     cFrame = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
-//     return cFrame;
-//   }
-//   else {
-//     cFrame.create(Size(g_ImageWidth,
-//                        g_ImageHeight),
-//                        CV_16UC1);
-//     cFrame.data = pFrameAddress;
-//   }
-//   return cFrame;
-// }
+  uint8_t * pFrameAddress = GetRawImage();
+
+  if (pFrameAddress == NULL) {
+    Image = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+    return Image;
+  }
+  else {
+    Image.create(Size(g_ImageWidth,
+                       g_ImageHeight),
+                       CV_16UC1);
+    Image.data = pFrameAddress;
+  }
+  return Image;
+}
