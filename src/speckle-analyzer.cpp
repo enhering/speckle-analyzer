@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
 
     switch (PressedKey) {
       case -1: break; // Nothing pressed
-      case 67: nImageSelect = 0; break;
-      case 68: nImageSelect = 1; break;
+      case 99: nImageSelect = 0; break;
+      case 100: nImageSelect = 1; break;
       default: bRepeat = false;
     }
 
