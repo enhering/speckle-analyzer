@@ -1,4 +1,3 @@
-
 #include "speckle-analyzer.h"
 
 static void onMouse(int event,int x,int y,int,void*) {
@@ -11,9 +10,11 @@ int main(int argc, char* argv[]) {
   g_pDC1394Wrapper = new DC1394Wrapper();
   g_pSpeckle = new Speckle();
 
+  g_pSpeckle->InitDataMatrix();
+
   TApplication app("app", &argc, argv);
 
-  cv::Mat CapturedFrame, ProcessedFrame;
+  cv::Mat CapturedFrame, ProcessedFrame, ImageDifference;
 
   g_pDC1394Wrapper->Init();
 
@@ -35,6 +36,10 @@ int main(int argc, char* argv[]) {
     g_pDC1394Wrapper->ReleaseFrame();
 
     g_pSpeckle->SetImage(CapturedFrame);
+    g_pSpeckle->FindIntensityExtremes();
+    g_pSpeckle->CalcActivity();
+
+    ImageDifference = g_pSpeckle->GetImageDifference();
     ProcessedFrame = g_pSpeckle->GetProcessedImage();
 
     gSystem->ProcessEvents();
@@ -43,12 +48,14 @@ int main(int argc, char* argv[]) {
 
     switch (PressedKey) {
       case -1: break; // Nothing pressed
-      case 99: nImageSelect = 0; break;
-      case 100: nImageSelect = 1; break;
+      case 99: nImageSelect = 0; break;  //c
+      case 100: nImageSelect = 1; break; //d
+      case 101: nImageSelect = 2; break; //e
       default: bRepeat = false;
     }
 
     switch(nImageSelect) {
+      case 2:  imshow("Current", ImageDifference);
       case 1:  imshow("Current", ProcessedFrame);
       case 0:
       default: imshow("Current", CapturedFrame);
