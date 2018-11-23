@@ -222,3 +222,4 @@ pull:
 
 src/classes/DC1394Wrapper.o: src/classes/DC1394Wrapper.h src/classes/Base.h
 src/classes/Base.o: src/classes/Base.h
+src/classes/Speckle.o: src/classes/Speckle.h src/classes/Base.h

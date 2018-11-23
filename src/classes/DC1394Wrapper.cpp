@@ -264,7 +264,7 @@ void DC1394Wrapper::CheckError(int nStep) {
 
 cv::Mat DC1394Wrapper::CaptureImage() {
 
-  Mat Image;
+  cv::Mat Image;
 
   Grab();
 
@@ -273,13 +273,11 @@ cv::Mat DC1394Wrapper::CaptureImage() {
   uint8_t * pFrameAddress = GetRawImage();
 
   if (pFrameAddress == NULL) {
-    Image = cv::Mat::zeros(g_ImageHeight, g_ImageWidth, CV_16UC1);
+    Image = cv::Mat::zeros(m_nHeight, m_nWidth, CV_16UC1);
     return Image;
   }
   else {
-    Image.create(Size(g_ImageWidth,
-                       g_ImageHeight),
-                       CV_16UC1);
+    Image.create(cv::Size(m_nWidth, m_nHeight),CV_16UC1);
     Image.data = pFrameAddress;
   }
   return Image;

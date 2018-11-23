@@ -10,7 +10,9 @@
       Speckle();
       ~Speckle();
 
-      void SetImage(cv::Mat Image) { m_LastInputImage = m_InputImage; m_InputImage = Image; }
+      void InitDataMatrix();
+
+      void SetImage(cv::Mat Image);
 
       cv::Mat GetProcessedImage() { return m_ProcessedImage; }
 
@@ -20,9 +22,11 @@
       void CalcActivity();
 
     private:
-      cv::Mat m_InputImage, m_LastInputImage;
+      cv::Mat m_InputImage, m_LastInputImage, m_ProcessedImage;
 
       unsigned char m_nImageRows, m_nImageCols;
+
+      long m_nNumFrame;
 
       double m_MaxIntensity, m_MinIntensity;
 
@@ -30,6 +34,6 @@
 
       double m_nMaxIntensity;
       int m_ImageHeight, m_ImageWidth;
-  }
+  };
 
 #endif

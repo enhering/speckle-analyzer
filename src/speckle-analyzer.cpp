@@ -1,22 +1,9 @@
-#include <iostream>
 
-#include "opencv2/opencv.hpp"
-
-#include "TApplication.h"
-
-#include "DC1394Wrapper.h"
-#include "Speckle.h"
-
-int g_nMouseX, g_nMouseY;
-
-DC1394Wrapper * g_pDC1394Wrapper;
-Speckle * g_pSpeckle;
+#include "speckle-analyzer.h"
 
 static void onMouse(int event,int x,int y,int,void*) {
   g_nMouseX = x;
   g_nMouseY = y;
-
-  g_bEraseAllData = true;
 }
 
 int main(int argc, char* argv[]) {
@@ -24,7 +11,7 @@ int main(int argc, char* argv[]) {
   g_pDC1394Wrapper = new DC1394Wrapper();
   g_pSpeckle = new Speckle();
 
-  TApplication  app("app", &argc, argv);
+  TApplication app("app", &argc, argv);
 
   cv::Mat CapturedFrame, ProcessedFrame;
 
@@ -35,8 +22,8 @@ int main(int argc, char* argv[]) {
 
   g_pSpeckle->SetImage(CapturedFrame);
 
-  namedWindow("Current",1);
-  setMouseCallback("Current", onMouse);
+  cv::namedWindow("Current",1);
+  cv::setMouseCallback("Current", onMouse);
 
   char nImageSelect = 0;
 
@@ -52,7 +39,7 @@ int main(int argc, char* argv[]) {
 
     gSystem->ProcessEvents();
 
-    char PressedKey = waitkey(30);
+    char PressedKey = cv::waitKey(30);
 
     switch (PressedKey) {
       case -1: break; // Nothing pressed

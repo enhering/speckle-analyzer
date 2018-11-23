@@ -1,6 +1,8 @@
 #ifndef DC1394WRAPPER_H_
   #define DC1394WRAPPER_H_
 
+  #include "opencv2/opencv.hpp"
+
   #include "Base.h"
 
   class DC1394Wrapper : public Base {
@@ -25,6 +27,8 @@
       void StopTransmission();
       void FreeRGBBuffer();
       void Cleanup(dc1394camera_t *);
+
+      cv::Mat CaptureImage();
 
 
       void Close();
